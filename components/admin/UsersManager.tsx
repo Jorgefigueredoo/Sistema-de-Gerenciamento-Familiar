@@ -163,7 +163,8 @@ function NewUserForm({ roles, onDone }: { roles: Role[]; onDone: () => void }) {
           className={INPUT}
         />
         <span className="mt-1 block text-xs text-ink-500">
-          Passe essa senha para a pessoa. Ela pode trocar depois em “Esqueci minha senha”.
+          Passe essa senha para a pessoa. Se ela esquecer, você define uma nova aqui
+          mesmo — o app não manda e-mail de recuperação.
         </span>
       </label>
 

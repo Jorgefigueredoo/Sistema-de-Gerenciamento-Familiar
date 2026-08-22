@@ -4,7 +4,7 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/supabase/config';
 import type { Database } from '@/types/database';
 
 /** Rotas que podem ser abertas sem sessão. */
-const PUBLIC_PATHS = ['/login', '/recuperar-senha', '/nova-senha', '/auth/callback', '/offline'];
+const PUBLIC_PATHS = ['/login', '/offline'];
 
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));

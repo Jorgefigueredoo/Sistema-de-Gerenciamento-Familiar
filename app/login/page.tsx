@@ -107,12 +107,10 @@ function LoginForm() {
         Entrar
       </Button>
 
-      <Link
-        href="/recuperar-senha"
-        className="mx-auto rounded-lg px-2 py-1 text-sm font-extrabold text-ink-500 underline decoration-accent-400 decoration-2 underline-offset-4 transition hover:text-ink-900"
-      >
-        Esqueci minha senha
-      </Link>
+      <p className="mx-auto max-w-[24rem] text-center text-xs font-medium text-ink-400">
+        Esqueceu a senha? Peça para quem administra a agenda definir uma nova
+        para você.
+      </p>
     </form>
   );
 }

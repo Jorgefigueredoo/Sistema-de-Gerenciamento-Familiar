@@ -23,10 +23,7 @@ Só quem for cadastrado por um administrador entra. Cada pessoa tem um **papel**
 │   │       ├── usuarios/
 │   │       └── papeis/
 │   ├── actions/                # Server Actions (tasks, admin, auth)
-│   ├── auth/callback/          # troca o link do e-mail por uma sessão
 │   ├── login/
-│   ├── recuperar-senha/
-│   ├── nova-senha/
 │   ├── globals.css
 │   └── layout.tsx
 ├── components/                 # UI reutilizável
@@ -100,7 +97,6 @@ Preencha o `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...
 SUPABASE_SERVICE_ROLE_KEY=sb_secret_...
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 > ⚠️ A `SUPABASE_SERVICE_ROLE_KEY` ignora todas as regras de segurança do banco. Ela **nunca** pode ganhar o prefixo `NEXT_PUBLIC_` nem ser commitada. O `.gitignore` já bloqueia o `.env.local`.
@@ -145,9 +141,9 @@ O gatilho `handle_new_user` cria o perfil automaticamente e — por ser **o prim
 Em **Authentication → URL Configuration**:
 
 - **Site URL:** `http://localhost:3000` (troque pela URL da Vercel quando publicar)
-- **Redirect URLs:** adicione `http://localhost:3000/**` e, depois, `https://seu-app.vercel.app/**`
 
-Isso é o que faz o link de "esqueci minha senha" funcionar.
+O app não usa link por e-mail em lugar nenhum, então não há Redirect URL
+para configurar. Veja "Senhas" mais abaixo.
 
 ### 7. Subir o projeto
 
@@ -194,7 +190,26 @@ Papéis novos e a marcação de permissões são feitos pela tela `/admin/papeis
 
 Em `/admin/usuarios`, o botão **Cadastrar pessoa** pede nome, e-mail, **senha provisória** e papel.
 
-A senha provisória existe porque o plano gratuito do Supabase manda pouquíssimos e-mails: um fluxo de convite por e-mail seria frágil. Então a administradora define uma senha, passa para a pessoa, e essa pessoa troca depois em **Esqueci minha senha** (ou a própria administradora troca em `/admin/usuarios`). Se você configurar um SMTP próprio no Supabase, dá para migrar para convite por e-mail sem mexer no banco.
+### Senhas
+
+**O app não manda e-mail nenhum.** Não existe "esqueci minha senha", e isso é
+uma decisão consciente: o serviço de e-mail embutido do Supabase é limitado a
+poucos envios por hora e só serve para desenvolvimento, e configurar um SMTP
+próprio não valia a pena para uma agenda de família.
+
+Na prática, quem administra é o "esqueci minha senha":
+
+- **Pessoa nova:** a administradora cadastra em `/admin/usuarios` com uma senha
+  provisória e passa para a pessoa.
+- **Esqueceu a senha:** a administradora define uma nova em `/admin/usuarios`,
+  no mesmo lugar.
+
+A consequência a ter em mente é que **ninguém troca a própria senha sozinho** —
+sempre passa pela administradora. Se um dia isso incomodar, o caminho barato é
+uma tela de "trocar senha" para quem já está logado: ela usa
+`supabase.auth.updateUser({ password })` e **não** precisa de e-mail nem de
+SMTP. O caminho caro é reativar a recuperação por e-mail, que aí sim exige
+configurar um SMTP.
 
 O cadastro usa a `service_role` no servidor, e sempre **depois** de conferir a permissão `manage_users` de quem está chamando.
 
@@ -229,7 +244,7 @@ As telas `/admin/*` são bloqueadas no servidor antes de renderizar (`requirePer
 
 | Rota               | O que faz                                                                |
 | ------------------ | ------------------------------------------------------------------------ |
-| `/login`           | e-mail + senha, com "esqueci minha senha"                                |
+| `/login`           | e-mail e senha                                                           |
 | `/`                | **Agenda** — a semana dia a dia: régua dos 7 dias, troca de semana, atrasadas |
 | `/delegado`        | **Delegado** — o que foi passado para outra pessoa e o status de cada uma |
 | `/nova-tarefa`     | criação rápida: título, categoria, dia da semana, período, horário, recorrência |
@@ -250,7 +265,6 @@ As telas `/admin/*` são bloqueadas no servidor antes de renderizar (`requirePer
    | `NEXT_PUBLIC_SUPABASE_URL`      | URL do projeto Supabase              |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | chave anon                           |
    | `SUPABASE_SERVICE_ROLE_KEY`     | chave service_role                   |
-   | `NEXT_PUBLIC_SITE_URL`          | `https://seu-app.vercel.app`         |
 
 5. Clique em **Deploy**.
 6. Volte ao Supabase em **Authentication → URL Configuration** e coloque a URL da Vercel em **Site URL** e em **Redirect URLs** (`https://seu-app.vercel.app/**`).
@@ -303,5 +317,6 @@ Campos de `tasks` que valem explicação:
 
 **`infinite recursion detected in policy`** — o arquivo de policies foi rodado sem o de schema (as funções `has_permission` etc. vivem lá). Rode as migrations na ordem.
 
-**O link de recuperar senha leva para `localhost` em produção** — falta ajustar **Site URL** no Supabase e `NEXT_PUBLIC_SITE_URL` na Vercel.
+**Esqueceu a senha** — não há recuperação por e-mail. Quem administra define
+uma nova em `/admin/usuarios`.
 # Sistema-de-Gerenciamento-Familiar
