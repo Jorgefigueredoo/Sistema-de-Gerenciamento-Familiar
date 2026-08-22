@@ -9,8 +9,9 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: '/',
     display: 'standalone',
     orientation: 'portrait',
-    background_color: '#f9f8fb',
-    theme_color: '#ffffff',
+    // Papel creme: é a cor real do app, então a splash não pisca branco.
+    background_color: '#fdf6ec',
+    theme_color: '#fdf6ec',
     lang: 'pt-BR',
     categories: ['productivity', 'lifestyle'],
     icons: [

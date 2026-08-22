@@ -13,9 +13,11 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-// Gradiente da marca: rosa → violeta
-const C1 = [236, 72, 153];
-const C2 = [139, 92, 246];
+// Paleta do app: tinta quente de fundo, papel creme e o dourado de acento.
+const INK_TOP = [76, 54, 37]; // #4c3625
+const INK_BOTTOM = [33, 23, 16]; // #211710
+const CREAM = [255, 250, 240];
+const GOLD = [240, 176, 22]; // accent-400
 
 // ---------------------------------------------------------------------
 // PNG mínimo (RGBA, sem filtro)
@@ -80,7 +82,13 @@ function distanceToSegment(px, py, ax, ay, bx, by) {
   return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
 }
 
-/** Cor final do pixel em coordenadas normalizadas. */
+/**
+ * Cor final do pixel em coordenadas normalizadas.
+ *
+ * O desenho é pensado para 16×16 antes de qualquer outra coisa: poucas
+ * formas, todas gordas, e contraste alto entre elas. Fundo de tinta,
+ * faixa dourada no topo do calendário e um tique grosso em cima do creme.
+ */
 function sample(x, y, { maskable }) {
   // Fundo: quadrado arredondado (ou sangria total no maskable)
   const radius = maskable ? 0 : 0.235;
@@ -89,9 +97,9 @@ function sample(x, y, { maskable }) {
 
   const t = Math.min(1, Math.max(0, (x + y) / 2));
   const bg = [
-    Math.round(C1[0] + (C2[0] - C1[0]) * t),
-    Math.round(C1[1] + (C2[1] - C1[1]) * t),
-    Math.round(C1[2] + (C2[2] - C1[2]) * t),
+    Math.round(INK_TOP[0] + (INK_BOTTOM[0] - INK_TOP[0]) * t),
+    Math.round(INK_TOP[1] + (INK_BOTTOM[1] - INK_TOP[1]) * t),
+    Math.round(INK_TOP[2] + (INK_BOTTOM[2] - INK_TOP[2]) * t),
   ];
 
   // No maskable o desenho encolhe para caber na zona segura (80%)
@@ -99,20 +107,19 @@ function sample(x, y, { maskable }) {
   const gx = (x - 0.5) / scale + 0.5;
   const gy = (y - 0.5) / scale + 0.5;
 
-  const body = insideRoundRect(gx, gy, 0.19, 0.29, 0.81, 0.83, 0.075);
-  const header = gy <= 0.44 && insideRoundRect(gx, gy, 0.19, 0.29, 0.81, 0.83, 0.075);
-  const rings =
-    insideRoundRect(gx, gy, 0.32, 0.17, 0.41, 0.37, 0.045) ||
-    insideRoundRect(gx, gy, 0.59, 0.17, 0.68, 0.37, 0.045);
+  // Sem argolas de propósito: a 16px elas colavam na faixa e viravam
+  // uma mancha. Ficaram só duas formas — a faixa dourada e o tique.
+  const body = insideRoundRect(gx, gy, 0.13, 0.19, 0.87, 0.87, 0.1);
+  const header = body && gy <= 0.395;
 
   const check =
     Math.min(
-      distanceToSegment(gx, gy, 0.34, 0.6, 0.45, 0.71),
-      distanceToSegment(gx, gy, 0.45, 0.71, 0.68, 0.5),
-    ) <= 0.036;
+      distanceToSegment(gx, gy, 0.29, 0.635, 0.43, 0.775),
+      distanceToSegment(gx, gy, 0.43, 0.775, 0.73, 0.475),
+    ) <= 0.063;
 
-  if (rings) return [255, 255, 255, 255];
-  if (body && !header) return check ? [...bg, 255] : [255, 255, 255, 255];
+  if (header) return [...GOLD, 255];
+  if (body) return check ? [...INK_BOTTOM, 255] : [...CREAM, 255];
   return [...bg, 255];
 }
 
