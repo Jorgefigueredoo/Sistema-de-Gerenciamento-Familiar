@@ -8,6 +8,7 @@ import { todayISO } from '@/lib/dates';
 import { getDelegatedTasks } from '@/lib/tasks';
 import type { TaskView } from '@/lib/tasks';
 
+export const metadata = { title: 'Delegado' };
 export const dynamic = 'force-dynamic';
 
 export default async function DelegatedPage() {
@@ -25,14 +26,16 @@ export default async function DelegatedPage() {
   }
 
   const pendingCount = tasks.filter((t) => !t.done).length;
+  const canCreate = session.permissions.includes('create_task');
 
   return (
     <>
       <PageTitle
+        emoji="🤝"
         title="Delegado"
         subtitle={
           tasks.length
-            ? `${pendingCount} pendente${pendingCount === 1 ? '' : 's'} de ${tasks.length}`
+            ? `${pendingCount} ${pendingCount === 1 ? 'pendente' : 'pendentes'} de ${tasks.length}`
             : 'Nada delegado ainda'
         }
       />
@@ -47,53 +50,58 @@ export default async function DelegatedPage() {
         />
       )}
 
-      {[...groups.entries()].map(([id, group]) => {
-        const groupDone = group.tasks.filter((t) => t.done).length;
-        return (
-          <section key={id} className="mb-6">
-            <div className="mb-2 flex items-center justify-between gap-2 px-1">
-              <h2 className="flex items-center gap-2 text-sm font-bold text-slate-700">
+      <div className="sm:grid sm:grid-cols-2 sm:gap-x-5">
+        {[...groups.entries()].map(([id, group]) => {
+          const groupDone = group.tasks.filter((t) => t.done).length;
+          const complete = groupDone === group.tasks.length;
+
+          return (
+            <section key={id} className="mb-7">
+              <div className="mb-3 flex items-center gap-2.5">
                 <span
                   aria-hidden
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700"
+                  className="surface-gradient flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
                 >
                   {group.name.charAt(0).toUpperCase()}
                 </span>
-                {group.name}
-              </h2>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                  groupDone === group.tasks.length
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-slate-100 text-slate-500'
-                }`}
-              >
-                {groupDone}/{group.tasks.length} feito{group.tasks.length > 1 ? 's' : ''}
-              </span>
-            </div>
+                <h2 className="truncate text-sm font-extrabold tracking-tight text-ink-800">
+                  {group.name}
+                </h2>
+                <span className="h-px flex-1 bg-ink-200/70" aria-hidden />
+                <span
+                  className={`tabular rounded-full px-2 py-0.5 text-[11px] font-bold
+                    ${complete ? 'bg-emerald-50 text-emerald-600' : 'bg-ink-100 text-ink-500'}`}
+                >
+                  {groupDone}/{group.tasks.length}
+                </span>
+              </div>
 
-            <ul className="flex flex-col gap-2">
-              {group.tasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  date={today}
-                  showAuthor={task.author?.id !== session.userId}
-                  canManage={
-                    task.created_by === session.userId ||
-                    session.permissions.includes('edit_others_tasks')
-                  }
-                />
-              ))}
-            </ul>
-          </section>
-        );
-      })}
+              <ul className="flex flex-col gap-2.5">
+                {group.tasks.map((task, index) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    date={today}
+                    index={index}
+                    showAuthor={task.author?.id !== session.userId}
+                    canManage={
+                      task.created_by === session.userId ||
+                      session.permissions.includes('edit_others_tasks')
+                    }
+                  />
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
 
-      {session.permissions.includes('create_task') && (
+      {canCreate && (
         <Link
           href="/nova-tarefa?destino=delegated"
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 px-4 py-4 text-sm font-semibold text-slate-500 transition hover:border-brand-400 hover:text-brand-600"
+          className="pressable flex w-full items-center justify-center gap-2 rounded-3xl border-2 border-dashed
+            border-ink-200 px-4 py-4 text-sm font-bold text-ink-400 transition
+            hover:border-brand-300 hover:bg-white/60 hover:text-brand-600"
         >
           + Delegar uma tarefa
         </Link>

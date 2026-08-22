@@ -3,9 +3,9 @@ export function ProgressSummary({ done, total }: { done: number; total: number }
   const finished = total > 0 && done === total;
 
   return (
-    <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="mt-3 rounded-2xl border border-ink-200 bg-white p-4 shadow-sm">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-sm font-semibold text-slate-700">
+        <p className="text-sm font-semibold text-ink-700">
           {total === 0 ? (
             'Nada marcado para hoje'
           ) : (
@@ -15,11 +15,11 @@ export function ProgressSummary({ done, total }: { done: number; total: number }
             </>
           )}
         </p>
-        <span className="text-xs font-semibold text-slate-400">{percent}%</span>
+        <span className="text-xs font-semibold text-ink-400">{percent}%</span>
       </div>
 
       <div
-        className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"
+        className="mt-2 h-2 overflow-hidden rounded-full bg-ink-100"
         role="progressbar"
         aria-valuenow={percent}
         aria-valuemin={0}

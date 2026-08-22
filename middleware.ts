@@ -4,7 +4,7 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/supabase/config';
 import type { Database } from '@/types/database';
 
 /** Rotas que podem ser abertas sem sessão. */
-const PUBLIC_PATHS = ['/login', '/recuperar-senha', '/nova-senha', '/auth/callback'];
+const PUBLIC_PATHS = ['/login', '/recuperar-senha', '/nova-senha', '/auth/callback', '/offline'];
 
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -66,6 +66,6 @@ export const config = {
     /*
      * Tudo, menos arquivos estáticos e imagens.
      */
-    '/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 };

@@ -1,11 +1,19 @@
 export default function Loading() {
   return (
-    <div className="space-y-4" aria-busy="true" aria-label="Carregando">
-      <div className="h-8 w-40 animate-pulse rounded-lg bg-slate-200" />
-      <div className="h-3 w-56 animate-pulse rounded bg-slate-200" />
-      <div className="space-y-3 pt-4">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-[72px] animate-pulse rounded-2xl bg-white shadow-sm" />
+    <div aria-busy="true" aria-label="Carregando" className="animate-fade-in">
+      <div className="h-40 animate-pulse rounded-4xl bg-white/70" />
+
+      <div className="mt-7 space-y-3">
+        <div className="h-4 w-32 animate-pulse rounded-full bg-white/70" />
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-[86px] animate-pulse rounded-3xl bg-white/80" />
+        ))}
+      </div>
+
+      <div className="mt-7 space-y-3">
+        <div className="h-4 w-28 animate-pulse rounded-full bg-white/70" />
+        {[0, 1].map((i) => (
+          <div key={i} className="h-[86px] animate-pulse rounded-3xl bg-white/80" />
         ))}
       </div>
     </div>

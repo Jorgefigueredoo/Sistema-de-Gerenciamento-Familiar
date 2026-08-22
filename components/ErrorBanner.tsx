@@ -10,10 +10,12 @@ export function ErrorBanner({ message, className = '' }: Props) {
   return (
     <p
       role="alert"
-      className={`flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700 ${className}`}
+      className={`flex animate-fade-in items-start gap-2.5 rounded-2xl border border-red-100 bg-red-50 px-3.5 py-3 text-sm font-medium text-red-700 ${className}`}
     >
-      <span aria-hidden>⚠️</span>
-      <span>{message}</span>
+      <span aria-hidden className="text-base leading-none">
+        ⚠️
+      </span>
+      <span className="min-w-0">{message}</span>
     </p>
   );
 }

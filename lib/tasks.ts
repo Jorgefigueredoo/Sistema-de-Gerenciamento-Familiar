@@ -67,6 +67,8 @@ export type TodayBoard = {
   periods: Record<TaskPeriod, TaskView[]>;
   /** Sem período definido — aparecem em "A qualquer hora". */
   anytime: TaskView[];
+  /** Tarefas que outra pessoa delegou para o usuário atual. */
+  delegated: TaskView[];
   /** Ficaram para trás em dias anteriores e continuam pendentes. */
   overdue: TaskView[];
   total: number;
@@ -83,8 +85,12 @@ export async function getTodayBoard(
     supabase
       .from('tasks')
       .select(SELECT)
-      .eq('scope', 'today')
-      .or(`and(or(${mineFilter(userId)}),or(date.lte.${date},is_recurring.eq.true))`)
+      // "Hoje" reúne a agenda pessoal e o que foi delegado para mim.
+      // Tarefas delegadas não recebem data/período no cadastro, por isso
+      // precisam de uma condição separada da agenda datada.
+      .or(
+        `and(scope.eq.today,or(${mineFilter(userId)}),or(date.lte.${date},is_recurring.eq.true)),and(scope.eq.delegated,delegated_to.eq.${userId})`,
+      )
       .order('time', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: true }),
     completionsFor(date),
@@ -93,6 +99,7 @@ export async function getTodayBoard(
   const empty: TodayBoard = {
     periods: { manha: [], tarde: [], noite: [] },
     anytime: [],
+    delegated: [],
     overdue: [],
     total: 0,
     doneCount: 0,
@@ -104,6 +111,13 @@ export async function getTodayBoard(
 
   for (const row of (data ?? []) as unknown as Row[]) {
     const view = toView(row, date, completions);
+
+    // Delegadas não têm um horário obrigatório: ficam numa lista própria
+    // para não se misturarem com a rotina que a pessoa criou para si.
+    if (row.scope === 'delegated') {
+      board.delegated.push(view);
+      continue;
+    }
 
     // Recorrente entra apenas nos dias em que a regra cai.
     if (row.is_recurring) {
@@ -124,6 +138,7 @@ export async function getTodayBoard(
     ...board.periods.tarde,
     ...board.periods.noite,
     ...board.anytime,
+    ...board.delegated,
   ];
   board.total = doTasks.length;
   board.doneCount = doTasks.filter((t) => t.done).length;

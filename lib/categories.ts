@@ -4,84 +4,93 @@ export type CategoryMeta = {
   key: TaskCategory;
   label: string;
   icon: string;
-  /** Fundo suave + texto: usado em chips e cards. */
+  /** Bolha do ícone no card da tarefa. */
+  soft: string;
+  /** Chip pequeno com o nome da categoria. */
   chip: string;
-  /** Barra lateral colorida do card da tarefa. */
-  bar: string;
+  /** Preenchimento do checkbox quando concluída. */
+  solid: string;
   /** Estado selecionado no seletor de categoria. */
   selected: string;
-  /** Cor do checkbox/acento. */
-  accent: string;
+  /** Gradiente usado em destaques. */
+  gradient: string;
 };
 
 /**
  * Fonte única de verdade de cor + ícone por categoria.
  * As classes são escritas por extenso de propósito: o Tailwind não
- * consegue enxergar classes montadas dinamicamente (`bg-${cor}-100`).
+ * enxerga classes montadas dinamicamente (`bg-${cor}-100`).
  */
 export const CATEGORIES: Record<TaskCategory, CategoryMeta> = {
   trabalho: {
     key: 'trabalho',
     label: 'Trabalho',
     icon: '💼',
-    chip: 'bg-sky-100 text-sky-800',
-    bar: 'bg-sky-500',
-    selected: 'border-sky-500 bg-sky-50 text-sky-900 ring-sky-200',
-    accent: 'accent-sky-600',
+    soft: 'bg-sky-100 text-sky-700',
+    chip: 'bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-100',
+    solid: 'bg-sky-500',
+    selected: 'border-sky-400 bg-sky-50 text-sky-900 ring-sky-100',
+    gradient: 'from-sky-400 to-sky-600',
   },
   casa: {
     key: 'casa',
     label: 'Casa',
     icon: '🏠',
-    chip: 'bg-amber-100 text-amber-800',
-    bar: 'bg-amber-500',
-    selected: 'border-amber-500 bg-amber-50 text-amber-900 ring-amber-200',
-    accent: 'accent-amber-600',
+    soft: 'bg-amber-100 text-amber-700',
+    chip: 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-100',
+    solid: 'bg-amber-500',
+    selected: 'border-amber-400 bg-amber-50 text-amber-900 ring-amber-100',
+    gradient: 'from-amber-400 to-amber-600',
   },
   alimentacao: {
     key: 'alimentacao',
     label: 'Alimentação',
     icon: '🍳',
-    chip: 'bg-orange-100 text-orange-800',
-    bar: 'bg-orange-500',
-    selected: 'border-orange-500 bg-orange-50 text-orange-900 ring-orange-200',
-    accent: 'accent-orange-600',
+    soft: 'bg-orange-100 text-orange-700',
+    chip: 'bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-100',
+    solid: 'bg-orange-500',
+    selected: 'border-orange-400 bg-orange-50 text-orange-900 ring-orange-100',
+    gradient: 'from-orange-400 to-orange-600',
   },
   familia: {
     key: 'familia',
     label: 'Família',
     icon: '👨‍👩‍👧',
-    chip: 'bg-rose-100 text-rose-800',
-    bar: 'bg-rose-500',
-    selected: 'border-rose-500 bg-rose-50 text-rose-900 ring-rose-200',
-    accent: 'accent-rose-600',
+    soft: 'bg-rose-100 text-rose-700',
+    chip: 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-100',
+    solid: 'bg-rose-500',
+    selected: 'border-rose-400 bg-rose-50 text-rose-900 ring-rose-100',
+    gradient: 'from-rose-400 to-rose-600',
   },
   treino: {
     key: 'treino',
     label: 'Treino',
     icon: '💪',
-    chip: 'bg-emerald-100 text-emerald-800',
-    bar: 'bg-emerald-500',
-    selected: 'border-emerald-500 bg-emerald-50 text-emerald-900 ring-emerald-200',
-    accent: 'accent-emerald-600',
+    soft: 'bg-emerald-100 text-emerald-700',
+    chip: 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-100',
+    solid: 'bg-emerald-500',
+    selected: 'border-emerald-400 bg-emerald-50 text-emerald-900 ring-emerald-100',
+    gradient: 'from-emerald-400 to-emerald-600',
   },
   espiritual: {
     key: 'espiritual',
     label: 'Espiritual',
     icon: '🙏',
-    chip: 'bg-violet-100 text-violet-800',
-    bar: 'bg-violet-500',
-    selected: 'border-violet-500 bg-violet-50 text-violet-900 ring-violet-200',
-    accent: 'accent-violet-600',
+    soft: 'bg-violet-100 text-violet-700',
+    chip: 'bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-100',
+    solid: 'bg-violet-500',
+    selected: 'border-violet-400 bg-violet-50 text-violet-900 ring-violet-100',
+    gradient: 'from-violet-400 to-violet-600',
   },
   compromisso: {
     key: 'compromisso',
     label: 'Compromissos',
     icon: '📌',
-    chip: 'bg-slate-200 text-slate-800',
-    bar: 'bg-slate-500',
-    selected: 'border-slate-500 bg-slate-50 text-slate-900 ring-slate-200',
-    accent: 'accent-slate-600',
+    soft: 'bg-teal-100 text-teal-700',
+    chip: 'bg-teal-50 text-teal-700 ring-1 ring-inset ring-teal-100',
+    solid: 'bg-teal-500',
+    selected: 'border-teal-400 bg-teal-50 text-teal-900 ring-teal-100',
+    gradient: 'from-teal-400 to-teal-600',
   },
 };
 

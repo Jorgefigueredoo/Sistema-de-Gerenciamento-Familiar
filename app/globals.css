@@ -2,24 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased;
+    /* Brilho quente no topo: tira o ar de "planilha" do fundo chapado */
+    background-image: radial-gradient(
+        90rem 40rem at 50% -20rem,
+        rgba(244, 63, 127, 0.16),
+        transparent 60%
+      ),
+      radial-gradient(60rem 30rem at 100% 0%, rgba(139, 92, 246, 0.12), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  /* Tipografia com números alinhados: contadores não "dançam" */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-brand-900;
+  }
 }
 
-html,
-body {
-  height: 100%;
-}
-
-body {
-  @apply bg-slate-50 text-slate-900 antialiased;
-  /* respeita a barra de gestos do celular */
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Alvo de toque confortável para o polegar */
 @layer components {
+  /* Alvo de toque confortável para o polegar */
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
+  }
+
+  .card {
+    @apply rounded-3xl border border-white/70 bg-white/90 shadow-soft backdrop-blur-sm;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-ink-200 bg-white px-4 py-3 text-base text-ink-900
+      placeholder:text-ink-400 transition
+      focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-100;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ink-700;
+  }
+
+  .surface-gradient {
+    background-image: linear-gradient(135deg, #e11d62 0%, #d0219a 45%, #7c3aed 100%);
+  }
+
+  /* Botão/chip que reage ao toque como app nativo */
+  .pressable {
+    @apply transition duration-150 active:scale-[0.97];
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Respeita quem pediu menos movimento no sistema */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

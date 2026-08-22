@@ -22,8 +22,7 @@ export type UserRow = {
   roleName: string | null;
 };
 
-const INPUT =
-  'w-full rounded-xl border border-slate-300 px-4 py-3 text-base placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200';
+const INPUT = 'field';
 
 export function UsersManager({
   users,
@@ -40,30 +39,30 @@ export function UsersManager({
 
   return (
     <>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-2.5">
         {users.map((user) => (
           <li
             key={user.id}
-            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+            className="flex items-center gap-3 rounded-3xl border border-white bg-white p-3 shadow-soft transition hover:shadow-lift"
           >
             <span
               aria-hidden
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700"
+              className="surface-gradient flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
             >
               {(user.name || user.email).charAt(0).toUpperCase()}
             </span>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-slate-900">
+              <p className="truncate text-sm font-bold text-ink-900">
                 {user.name || '(sem nome)'}
                 {user.id === currentUserId && (
-                  <span className="ml-1.5 text-xs font-normal text-slate-400">(você)</span>
+                  <span className="ml-1.5 text-xs font-normal text-ink-400">(você)</span>
                 )}
               </p>
-              <p className="truncate text-xs text-slate-500">{user.email}</p>
+              <p className="truncate text-xs text-ink-500">{user.email}</p>
             </div>
 
-            <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+            <span className="shrink-0 rounded-full bg-ink-100 px-2.5 py-1 text-[11px] font-bold text-ink-600">
               {user.roleName ?? 'sem papel'}
             </span>
 
@@ -71,7 +70,7 @@ export function UsersManager({
               type="button"
               onClick={() => setEditing(user)}
               aria-label={`Editar ${user.name || user.email}`}
-              className="touch-target shrink-0 rounded-full text-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              className="pressable touch-target flex shrink-0 items-center justify-center rounded-2xl text-lg text-ink-300 transition hover:bg-ink-100 hover:text-ink-600"
             >
               ⋯
             </button>
@@ -135,12 +134,12 @@ function NewUserForm({ roles, onDone }: { roles: Role[]; onDone: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">Nome</span>
+        <span className="label">Nome</span>
         <input name="name" type="text" required placeholder="Ex.: Pedro" className={INPUT} />
       </label>
 
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">E-mail</span>
+        <span className="label">E-mail</span>
         <input
           name="email"
           type="email"
@@ -152,7 +151,7 @@ function NewUserForm({ roles, onDone }: { roles: Role[]; onDone: () => void }) {
       </label>
 
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+        <span className="label">
           Senha provisória
         </span>
         <input
@@ -163,18 +162,18 @@ function NewUserForm({ roles, onDone }: { roles: Role[]; onDone: () => void }) {
           placeholder="mínimo 6 caracteres"
           className={INPUT}
         />
-        <span className="mt-1 block text-xs text-slate-500">
+        <span className="mt-1 block text-xs text-ink-500">
           Passe essa senha para a pessoa. Ela pode trocar depois em “Esqueci minha senha”.
         </span>
       </label>
 
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">Papel</span>
+        <span className="label">Papel</span>
         <select
           name="role_id"
           required
           defaultValue={defaultRole?.id}
-          className={`${INPUT} bg-white`}
+          className={INPUT}
         >
           {roles.map((role) => (
             <option key={role.id} value={role.id}>
@@ -256,17 +255,17 @@ function EditUserForm({
   return (
     <div className="flex flex-col gap-4">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">Nome</span>
+        <span className="label">Nome</span>
         <input value={name} onChange={(e) => setName(e.target.value)} className={INPUT} />
       </label>
 
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">Papel</span>
+        <span className="label">Papel</span>
         <select
           value={roleId}
           onChange={(e) => setRoleId(e.target.value)}
           disabled={isSelf}
-          className={`${INPUT} bg-white disabled:bg-slate-100 disabled:text-slate-400`}
+          className={`${INPUT} disabled:bg-ink-100 disabled:text-ink-400`}
         >
           <option value="">sem papel</option>
           {roles.map((role) => (
@@ -276,7 +275,7 @@ function EditUserForm({
           ))}
         </select>
         {isSelf && (
-          <span className="mt-1 block text-xs text-slate-500">
+          <span className="mt-1 block text-xs text-ink-500">
             Você não pode trocar o seu próprio papel.
           </span>
         )}
@@ -293,8 +292,8 @@ function EditUserForm({
         Salvar alterações
       </Button>
 
-      <details className="rounded-xl border border-slate-200 p-3">
-        <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+      <details className="rounded-xl border border-ink-200 p-3">
+        <summary className="cursor-pointer text-sm font-semibold text-ink-700">
           Definir uma senha nova
         </summary>
         <div className="mt-3 flex flex-col gap-2">

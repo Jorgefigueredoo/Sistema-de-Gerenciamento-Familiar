@@ -2,18 +2,26 @@ export function EmptyState({
   icon = '🌤️',
   title,
   description,
+  children,
 }: {
   icon?: string;
   title: string;
   description?: string;
+  children?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-10 text-center">
-      <div className="text-3xl" aria-hidden>
+    <div className="animate-fade-in rounded-4xl border border-dashed border-ink-200 bg-white/60 px-6 py-12 text-center">
+      <div
+        aria-hidden
+        className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl shadow-soft"
+      >
         {icon}
       </div>
-      <p className="mt-2 font-semibold text-slate-700">{title}</p>
-      {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+      <p className="mt-4 text-base font-bold text-ink-800">{title}</p>
+      {description && (
+        <p className="mx-auto mt-1.5 max-w-xs text-sm text-ink-500">{description}</p>
+      )}
+      {children && <div className="mt-5 flex justify-center">{children}</div>}
     </div>
   );
 }

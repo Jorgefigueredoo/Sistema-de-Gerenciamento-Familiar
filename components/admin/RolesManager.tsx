@@ -14,8 +14,7 @@ export type RoleRow = Role & {
   peopleCount: number;
 };
 
-const INPUT =
-  'w-full rounded-xl border border-slate-300 px-4 py-3 text-base placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200';
+const INPUT = 'field';
 
 export function RolesManager({
   roles,
@@ -30,35 +29,35 @@ export function RolesManager({
 
   return (
     <>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-2.5">
         {roles.map((role) => (
           <li key={role.id}>
             <button
               type="button"
               onClick={() => setEditing(role)}
-              className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-brand-300"
+              className="pressable w-full rounded-3xl border border-white bg-white p-4 text-left shadow-soft transition hover:shadow-lift"
             >
               <div className="flex items-center justify-between gap-3">
-                <p className="font-semibold text-slate-900">{role.name}</p>
-                <span className="shrink-0 text-xs font-medium text-slate-400">
+                <p className="font-extrabold tracking-tight text-ink-900">{role.name}</p>
+                <span className="shrink-0 text-xs font-medium text-ink-400">
                   {role.peopleCount} pessoa{role.peopleCount === 1 ? '' : 's'}
                 </span>
               </div>
 
               {role.description && (
-                <p className="mt-0.5 text-xs text-slate-500">{role.description}</p>
+                <p className="mt-0.5 text-xs text-ink-500">{role.description}</p>
               )}
 
               <div className="mt-2 flex flex-wrap gap-1">
                 {role.permissionIds.length === 0 && (
-                  <span className="text-xs text-slate-400">Nenhuma permissão marcada</span>
+                  <span className="text-xs text-ink-400">Nenhuma permissão marcada</span>
                 )}
                 {permissions
                   .filter((p) => role.permissionIds.includes(p.id))
                   .map((p) => (
                     <span
                       key={p.id}
-                      className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700"
+                      className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700 ring-1 ring-inset ring-brand-100"
                     >
                       {PERMISSION_LABELS[p.key] ?? p.key}
                     </span>
@@ -121,13 +120,13 @@ function NewRoleForm({ onDone }: { onDone: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">Nome do papel</span>
+        <span className="label">Nome do papel</span>
         <input name="name" type="text" required placeholder="Ex.: Ajudante" className={INPUT} />
       </label>
 
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">
-          Descrição <span className="font-normal text-slate-400">(opcional)</span>
+        <span className="label">
+          Descrição <span className="font-normal text-ink-400">(opcional)</span>
         </span>
         <input
           name="description"
@@ -143,7 +142,7 @@ function NewRoleForm({ onDone }: { onDone: () => void }) {
         Criar papel
       </Button>
 
-      <p className="text-center text-xs text-slate-500">
+      <p className="text-center text-xs text-ink-500">
         Depois de criar, toque no papel para marcar as permissões.
       </p>
     </form>
@@ -192,10 +191,10 @@ function PermissionEditor({
 
   return (
     <div className="flex flex-col gap-4">
-      {role.description && <p className="text-sm text-slate-500">{role.description}</p>}
+      {role.description && <p className="text-sm text-ink-500">{role.description}</p>}
 
       {isAdmin && (
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-xs font-medium text-amber-800">
           Cuidado ao mexer no Admin: se você tirar <strong>Gerenciar papéis</strong>, ninguém
           mais consegue abrir esta tela.
         </p>
@@ -206,18 +205,18 @@ function PermissionEditor({
           const checked = selected.includes(permission.id);
           return (
             <li key={permission.id}>
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3 transition hover:bg-slate-50">
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-ink-200 p-3.5 transition hover:border-brand-200 hover:bg-brand-50/40">
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggle(permission.id)}
-                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-300 accent-brand-600"
+                  className="mt-0.5 h-5 w-5 shrink-0 rounded-md border-ink-300 accent-brand-600"
                 />
                 <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-slate-800">
+                  <span className="block text-sm font-bold text-ink-800">
                     {PERMISSION_LABELS[permission.key] ?? permission.key}
                   </span>
-                  <span className="block text-xs text-slate-500">{permission.description}</span>
+                  <span className="block text-xs text-ink-500">{permission.description}</span>
                 </span>
               </label>
             </li>

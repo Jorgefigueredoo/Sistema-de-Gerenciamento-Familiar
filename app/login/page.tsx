@@ -63,7 +63,7 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">E-mail</span>
+        <span className="label">E-mail</span>
         <input
           type="email"
           name="email"
@@ -73,12 +73,12 @@ function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="voce@email.com"
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+          className="field"
         />
       </label>
 
       <label className="block">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-700">Senha</span>
+        <span className="label">Senha</span>
         <div className="relative">
           <input
             type={showPassword ? 'text' : 'password'}
@@ -88,13 +88,13 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-xl border border-slate-300 py-3 pl-4 pr-14 text-base placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+            className="field pr-14"
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
-            className="absolute inset-y-0 right-0 touch-target rounded-r-xl px-3 text-lg text-slate-400 hover:text-slate-600"
+            className="touch-target absolute inset-y-0 right-0 flex items-center rounded-r-2xl px-3 text-lg text-ink-400 transition hover:text-ink-600"
           >
             {showPassword ? '🙈' : '👁️'}
           </button>
@@ -103,13 +103,13 @@ function LoginForm() {
 
       <ErrorBanner message={error} />
 
-      <Button type="submit" full loading={loading}>
+      <Button type="submit" full loading={loading} className="mt-1">
         Entrar
       </Button>
 
       <Link
         href="/recuperar-senha"
-        className="mx-auto text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
+        className="mx-auto rounded-lg px-2 py-1 text-sm font-bold text-brand-600 transition hover:text-brand-700"
       >
         Esqueci minha senha
       </Link>
@@ -122,26 +122,24 @@ export default function LoginPage() {
     <main className="flex min-h-screen flex-col justify-center px-5 py-10">
       <div className="mx-auto w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600 text-3xl shadow-lg shadow-brand-600/25">
+          <div className="surface-gradient mx-auto flex h-20 w-20 items-center justify-center rounded-4xl text-4xl shadow-glow">
             <span aria-hidden>🗓️</span>
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-ink-900">
             Agenda da Família
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Entre para ver a rotina de hoje.
+          <p className="mt-1.5 text-sm text-ink-500">
+            A rotina da casa, do trabalho e da família em um lugar só.
           </p>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <Suspense
-            fallback={<div className="h-64 animate-pulse rounded-xl bg-slate-100" />}
-          >
+        <div className="rounded-4xl border border-white bg-white/90 p-6 shadow-lift backdrop-blur-sm">
+          <Suspense fallback={<div className="h-72 animate-pulse rounded-2xl bg-ink-100" />}>
             <LoginForm />
           </Suspense>
         </div>
 
-        <p className="mt-6 text-center text-xs text-slate-400">
+        <p className="mt-6 text-center text-xs text-ink-400">
           Sistema privado. O acesso é criado por um administrador da família.
         </p>
       </div>

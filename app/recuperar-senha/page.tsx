@@ -41,19 +41,19 @@ export default function RecoverPasswordPage() {
   return (
     <main className="flex min-h-screen flex-col justify-center px-5 py-10">
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Esqueci minha senha</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="text-3xl font-extrabold tracking-tight text-ink-900">Esqueci minha senha</h1>
+        <p className="mt-1.5 text-sm text-ink-500">
           Enviamos um link para você criar uma senha nova.
         </p>
 
-        <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mt-6 rounded-4xl border border-white bg-white/90 p-6 shadow-lift backdrop-blur-sm">
           {sent ? (
             <div className="text-center">
               <p className="text-3xl" aria-hidden>
                 📬
               </p>
-              <p className="mt-2 font-semibold text-slate-800">Link enviado</p>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-3 text-base font-bold text-ink-800">Link enviado</p>
+              <p className="mt-1.5 text-sm text-ink-500">
                 Se existe uma conta com <strong>{email}</strong>, o link chegou por e-mail.
                 Confira também a caixa de spam.
               </p>
@@ -61,7 +61,7 @@ export default function RecoverPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <label className="block">
-                <span className="mb-1.5 block text-sm font-semibold text-slate-700">E-mail</span>
+                <span className="label">E-mail</span>
                 <input
                   type="email"
                   required
@@ -70,7 +70,7 @@ export default function RecoverPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="voce@email.com"
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-base placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+                  className="field"
                 />
               </label>
 
@@ -85,7 +85,7 @@ export default function RecoverPasswordPage() {
 
         <Link
           href="/login"
-          className="mt-6 block text-center text-sm font-medium text-brand-600 hover:underline"
+          className="mt-6 block text-center text-sm font-bold text-brand-600 transition hover:text-brand-700"
         >
           ← Voltar para o login
         </Link>

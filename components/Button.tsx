@@ -5,11 +5,11 @@ import type { ButtonHTMLAttributes } from 'react';
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 disabled:bg-brand-300',
-  secondary:
-    'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 active:bg-slate-100',
-  ghost: 'bg-transparent text-slate-600 hover:bg-slate-100',
-  danger: 'bg-white text-red-600 border border-red-200 hover:bg-red-50',
+  primary:
+    'surface-gradient text-white shadow-glow hover:brightness-110 disabled:shadow-none disabled:brightness-100',
+  secondary: 'border border-ink-200 bg-white text-ink-700 shadow-soft hover:border-ink-300',
+  ghost: 'text-ink-600 hover:bg-ink-100',
+  danger: 'border border-red-200 bg-red-50 text-red-600 hover:bg-red-100',
 };
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -31,9 +31,10 @@ export function Button({
     <button
       {...rest}
       disabled={disabled || loading}
-      className={`touch-target inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
-        disabled:cursor-not-allowed disabled:opacity-70
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
+      className={`pressable touch-target inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3
+        text-sm font-bold tracking-tight
+        disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100
+        focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-200
         ${VARIANTS[variant]} ${full ? 'w-full' : ''} ${className}`}
     >
       {loading && <Spinner />}

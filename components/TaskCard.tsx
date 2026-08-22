@@ -3,15 +3,11 @@
 import { useState, useTransition } from 'react';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { ErrorBanner } from '@/components/ErrorBanner';
 import { getCategory, PERIOD_LIST } from '@/lib/categories';
 import { describeRecurrence, formatShortDate, formatTime } from '@/lib/dates';
-import {
-  deleteTask,
-  moveTaskToToday,
-  moveTaskToWeek,
-  toggleTask,
-} from '@/app/actions/tasks';
+import { deleteTask, moveTaskToToday, moveTaskToWeek, toggleTask } from '@/app/actions/tasks';
 import type { TaskView } from '@/lib/tasks';
 
 type Props = {
@@ -28,6 +24,8 @@ type Props = {
   canMoveToToday?: boolean;
   /** Oferece "deixar para essa semana" (tela Hoje). */
   canMoveToWeek?: boolean;
+  /** Atraso da animação de entrada, para a lista aparecer em cascata. */
+  index?: number;
 };
 
 export function TaskCard({
@@ -38,6 +36,7 @@ export function TaskCard({
   canManage = false,
   canMoveToToday = false,
   canMoveToWeek = false,
+  index = 0,
 }: Props) {
   const category = getCategory(task.category);
 
@@ -79,47 +78,67 @@ export function TaskCard({
 
   return (
     <li
-      className={`relative overflow-hidden rounded-2xl border bg-white shadow-sm transition
-        ${done ? 'border-slate-200 opacity-60' : 'border-slate-200'}
-        ${pending ? 'animate-pulse' : ''}`}
+      style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
+      className={`group animate-rise rounded-3xl border bg-white transition duration-300
+        ${
+          done
+            ? 'border-ink-100 bg-ink-50/60 shadow-none'
+            : 'border-white shadow-soft hover:-translate-y-0.5 hover:shadow-lift'
+        }`}
     >
-      <span className={`absolute inset-y-0 left-0 w-1.5 ${category.bar}`} aria-hidden />
-
-      <div className="flex items-start gap-3 py-3 pl-5 pr-2">
-        <input
-          type="checkbox"
+      <div className="flex items-start gap-3 p-3.5">
+        <Checkbox
           checked={done}
           onChange={handleToggle}
-          aria-label={done ? `Desmarcar ${task.title}` : `Concluir ${task.title}`}
-          className={`mt-0.5 h-6 w-6 shrink-0 cursor-pointer rounded-md border-slate-300 ${category.accent}`}
+          label={done ? `Desmarcar ${task.title}` : `Concluir ${task.title}`}
+          color={category.solid}
         />
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 pt-0.5">
           <p
-            className={`break-words text-[15px] font-medium leading-snug transition
-              ${done ? 'text-slate-400 line-through' : 'text-slate-900'}`}
+            className={`break-words text-[15px] font-semibold leading-snug transition duration-300
+              ${done ? 'text-ink-400 line-through decoration-ink-300' : 'text-ink-900'}`}
           >
             {task.title}
           </p>
 
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-            <span className={`rounded-full px-2 py-0.5 font-medium ${category.chip}`}>
-              {category.icon} {category.label}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-semibold ${category.chip}`}
+            >
+              <span aria-hidden>{category.icon}</span>
+              {category.label}
             </span>
 
-            {time && <span className="font-medium text-slate-600">🕐 {time}</span>}
-
-            {task.overdue && (
-              <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-700">
-                atrasada{task.date ? ` de ${formatShortDate(task.date)}` : ''}
+            {time && (
+              <span className="tabular inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-1 font-semibold text-ink-600">
+                🕐 {time}
               </span>
             )}
 
-            {recurrence && <span>🔁 {recurrence}</span>}
+            {task.overdue && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 font-semibold text-red-600 ring-1 ring-inset ring-red-100">
+                ⏰ {task.date ? formatShortDate(task.date) : 'atrasada'}
+              </span>
+            )}
 
-            {showDelegate && task.delegate && <span>👤 {task.delegate.name}</span>}
+            {recurrence && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-1 font-medium text-ink-500">
+                🔁 {recurrence}
+              </span>
+            )}
 
-            {showAuthor && task.author && <span>✍️ {task.author.name}</span>}
+            {showDelegate && task.delegate && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-accent-50 px-2 py-1 font-semibold text-accent-700">
+                👤 {task.delegate.name}
+              </span>
+            )}
+
+            {showAuthor && task.author && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-1 font-medium text-ink-500">
+                ✍️ {task.author.name}
+              </span>
+            )}
           </div>
 
           {error && <ErrorBanner message={error} className="mt-2" />}
@@ -130,7 +149,8 @@ export function TaskCard({
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label={`Opções de ${task.title}`}
-            className="touch-target -mr-1 rounded-full text-lg leading-none text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="pressable touch-target -mr-1 -mt-1 flex items-center justify-center rounded-2xl text-lg
+              text-ink-300 transition hover:bg-ink-100 hover:text-ink-600"
           >
             ⋯
           </button>
@@ -208,7 +228,7 @@ function MoveToTodayForm({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="mb-2 text-sm font-medium text-slate-700">Período do dia</p>
+        <p className="label">Período do dia</p>
         <div className="grid grid-cols-3 gap-2">
           {PERIOD_LIST.map((p) => (
             <button
@@ -216,14 +236,14 @@ function MoveToTodayForm({
               type="button"
               onClick={() => setPeriod(p.key)}
               aria-pressed={period === p.key}
-              className={`touch-target rounded-xl border-2 px-2 py-3 text-sm font-semibold transition
+              className={`pressable touch-target rounded-2xl border-2 px-2 py-3 text-sm font-bold transition
                 ${
                   period === p.key
-                    ? 'border-brand-500 bg-brand-50 text-brand-800'
-                    : 'border-slate-200 bg-white text-slate-600'
+                    ? 'border-brand-400 bg-brand-50 text-brand-800 ring-4 ring-brand-100'
+                    : 'border-ink-200 bg-white text-ink-500'
                 }`}
             >
-              <span className="block text-lg" aria-hidden>
+              <span className="mb-0.5 block text-xl" aria-hidden>
                 {p.icon}
               </span>
               {p.label}
@@ -233,14 +253,14 @@ function MoveToTodayForm({
       </div>
 
       <label className="block">
-        <span className="mb-1 block text-sm font-medium text-slate-700">
-          Horário <span className="font-normal text-slate-400">(opcional)</span>
+        <span className="label">
+          Horário <span className="font-normal text-ink-400">(opcional)</span>
         </span>
         <input
           type="time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          className="touch-target w-full rounded-xl border border-slate-300 px-3 py-2 text-base focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+          className="field tabular"
         />
       </label>
 

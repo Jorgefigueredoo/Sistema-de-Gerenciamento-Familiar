@@ -6,6 +6,7 @@ import { requireSession } from '@/lib/auth';
 import { isScope } from '@/lib/categories';
 import { getDelegateOptions } from '@/lib/tasks';
 
+export const metadata = { title: 'Nova tarefa' };
 export const dynamic = 'force-dynamic';
 
 export default async function NewTaskPage({
@@ -25,11 +26,11 @@ export default async function NewTaskPage({
 
   return (
     <>
-      <div className="mb-1 flex items-center justify-between">
-        <PageTitle title="Nova tarefa" />
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <PageTitle emoji="✨" title="Nova tarefa" />
         <Link
           href="/"
-          className="touch-target -mt-3 flex items-center rounded-xl px-3 text-sm font-semibold text-slate-500 hover:bg-slate-100"
+          className="pressable touch-target flex items-center rounded-2xl px-3 text-sm font-bold text-ink-400 transition hover:bg-ink-100 hover:text-ink-700"
         >
           Cancelar
         </Link>
