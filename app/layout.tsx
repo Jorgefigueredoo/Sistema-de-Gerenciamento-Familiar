@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import './globals.css';
 
 const sans = Plus_Jakarta_Sans({
@@ -40,8 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={sans.variable}>
       <body>
-        {children}
-        <ServiceWorkerRegister />
+        <ThemeProvider>
+          {children}
+          <ServiceWorkerRegister />
+        </ThemeProvider>
       </body>
     </html>
   );

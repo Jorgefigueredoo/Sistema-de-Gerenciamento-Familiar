@@ -7,6 +7,11 @@
     color-scheme: light;
   }
 
+  html.dark {
+    color-scheme: dark;
+    background: #17141f;
+  }
+
   html {
     -webkit-tap-highlight-color: transparent;
   }
@@ -26,6 +31,13 @@
       ),
       radial-gradient(60rem 30rem at 100% 0%, rgba(139, 92, 246, 0.12), transparent 55%);
     background-attachment: fixed;
+    transition: background-color 220ms ease, color 220ms ease;
+  }
+
+  html.dark body {
+    @apply bg-ink-900 text-ink-100;
+    background-image: radial-gradient(70rem 36rem at 50% -18rem, rgba(225, 29, 98, 0.27), transparent 60%),
+      radial-gradient(60rem 32rem at 100% 0%, rgba(124, 58, 237, 0.22), transparent 55%);
   }
 
   /* Tipografia com números alinhados: contadores não "dançam" */
@@ -66,6 +78,74 @@
   .pressable {
     @apply transition duration-150 active:scale-[0.97];
   }
+}
+
+/* Tema escuro: superfícies quentes, com contraste sem o preto absoluto. */
+html.dark .bg-white,
+html.dark [class~='bg-white/60'],
+html.dark [class~='bg-white/70'],
+html.dark [class~='bg-white/80'],
+html.dark [class~='bg-white/85'],
+html.dark [class~='bg-white/90'] {
+  background-color: rgba(42, 37, 52, 0.92) !important;
+}
+
+html.dark .bg-ink-50,
+html.dark [class~='bg-ink-50/60'] {
+  background-color: #211d29 !important;
+}
+
+html.dark .bg-ink-100 {
+  background-color: #302a3a !important;
+}
+
+html.dark .border-white,
+html.dark [class~='border-white/60'],
+html.dark [class~='border-white/70'],
+html.dark [class~='border-white/80'],
+html.dark .border-ink-100,
+html.dark .border-ink-200,
+html.dark .border-dashed {
+  border-color: rgba(255, 255, 255, 0.11) !important;
+}
+
+html.dark .text-ink-900,
+html.dark .text-ink-800 {
+  color: #fbf9ff !important;
+}
+
+html.dark .text-ink-700,
+html.dark .text-ink-600 {
+  color: #ddd6e8 !important;
+}
+
+html.dark .text-ink-500 {
+  color: #b6afc2 !important;
+}
+
+html.dark .text-ink-400,
+html.dark .text-ink-300 {
+  color: #938ca0 !important;
+}
+
+html.dark .field {
+  @apply border-white/10 bg-ink-800 text-ink-100 placeholder:text-ink-500;
+}
+
+html.dark .card {
+  @apply border-white/10 bg-ink-800/90;
+}
+
+html.dark .bg-brand-50 {
+  background-color: rgba(225, 29, 98, 0.16) !important;
+}
+
+html.dark .bg-accent-50 {
+  background-color: rgba(124, 58, 237, 0.18) !important;
+}
+
+html.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.14) !important;
 }
 
 @layer utilities {

@@ -1,4 +1,5 @@
 import { signOut } from '@/app/actions/auth';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 /** Cabeçalho do celular. No desktop essa função é da Sidebar. */
 export function AppHeader({ name, roleName }: { name: string; roleName: string | null }) {
@@ -20,6 +21,8 @@ export function AppHeader({ name, roleName }: { name: string; roleName: string |
         </div>
 
         <div className="flex items-center gap-1">
+          <ThemeSwitcher compact placement="down" />
+
           <span
             aria-hidden
             title={roleName ?? undefined}

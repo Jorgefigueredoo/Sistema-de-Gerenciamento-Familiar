@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { isNavActive, NAV_ITEMS } from '@/components/BottomNav';
 import { signOut } from '@/app/actions/auth';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 /** Navegação lateral do desktop. No celular quem manda é a BottomNav. */
 export function Sidebar({
@@ -101,6 +102,10 @@ export function Sidebar({
             Sair
           </button>
         </form>
+
+        <div className="mt-2 border-t border-ink-100 pt-2">
+          <ThemeSwitcher />
+        </div>
       </div>
     </aside>
   );
