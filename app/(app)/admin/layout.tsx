@@ -1,0 +1,31 @@
+import Link from 'next/link';
+import { requireSession } from '@/lib/auth';
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await requireSession();
+
+  const tabs = [
+    { href: '/admin/usuarios', label: '👥 Pessoas', permission: 'manage_users' },
+    { href: '/admin/papeis', label: '🔑 Papéis', permission: 'manage_roles' },
+  ].filter((tab) => session.permissions.includes(tab.permission as never));
+
+  return (
+    <>
+      {tabs.length > 1 && (
+        <nav className="mb-5 flex gap-1 rounded-xl bg-slate-100 p-1" aria-label="Administração">
+          {tabs.map((tab) => (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className="flex-1 rounded-lg px-3 py-2 text-center text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </nav>
+      )}
+
+      {children}
+    </>
+  );
+}

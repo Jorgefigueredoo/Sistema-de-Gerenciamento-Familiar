@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  /* respeita a barra de gestos do celular */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Alvo de toque confortável para o polegar */
+@layer components {
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
