@@ -3,7 +3,6 @@ import {
   formatShortDate,
   getWeekday,
   recurrenceMatchesDate,
-  todayISO,
   weekDates,
   weekdayOf,
   type WeekdayKey,
@@ -77,7 +76,8 @@ function toView(row: Row, date: string, completions: Set<string>): TaskView {
 // ---------------------------------------------------------------------
 export async function getUndatedTasks(
   userId: string,
-  date: string = todayISO(),
+  /** Hoje no fuso de quem olha — nunca o relógio do servidor. */
+  date: string,
 ): Promise<QueryResult<TaskView[]>> {
   const supabase = createClient();
 
@@ -130,7 +130,8 @@ export async function getOverdueTasks(
 // Tela Delegado
 // ---------------------------------------------------------------------
 export async function getDelegatedTasks(
-  date: string = todayISO(),
+  /** Hoje no fuso de quem olha — nunca o relógio do servidor. */
+  date: string,
 ): Promise<QueryResult<TaskView[]>> {
   const supabase = createClient();
 
@@ -204,7 +205,8 @@ async function completionsBetween(from: string, to: string): Promise<Map<string,
 export async function getAgendaWeek(
   userId: string,
   startISO: string,
-  today: string = todayISO(),
+  /** Hoje no fuso de quem olha — nunca o relógio do servidor. */
+  today: string,
 ): Promise<QueryResult<AgendaWeek>> {
   const supabase = createClient();
 

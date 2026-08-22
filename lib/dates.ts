@@ -13,6 +13,33 @@ export function todayISO(now: Date = new Date()): string {
   return toISO(now);
 }
 
+/**
+ * Data de hoje no fuso informado. É esta que o servidor deve usar: o
+ * relógio dele é UTC em produção, não o de quem está olhando a tela.
+ */
+export function todayISOIn(timeZone: string): string {
+  // `en-CA` formata exatamente como YYYY-MM-DD.
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
+/** Hora cheia (0–23) no fuso informado. */
+export function hourIn(timeZone: string): number {
+  const raw = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    hour12: false,
+  }).format(new Date());
+
+  const hour = Number(raw);
+  // Meia-noite sai como "24" em algumas versões do ICU.
+  return Number.isFinite(hour) ? hour % 24 : new Date().getHours();
+}
+
 /** ISO → Date na meia-noite local (evita o pulo de fuso do `new Date(iso)`). */
 export function parseISO(iso: string): Date {
   const [y, m, d] = iso.split('-').map(Number);
@@ -54,16 +81,18 @@ export function periodFromTime(time: string | null): TaskPeriod | null {
   return 'noite';
 }
 
-/** Período sugerido a partir da hora atual (usado como padrão no form). */
-export function currentPeriod(now: Date = new Date()): TaskPeriod {
-  const hour = now.getHours();
+export function periodForHour(hour: number): TaskPeriod {
   if (hour < 12) return 'manha';
   if (hour < 18) return 'tarde';
   return 'noite';
 }
 
-export function greeting(now: Date = new Date()): string {
-  const hour = now.getHours();
+/** Período sugerido a partir da hora atual (usado como padrão no form). */
+export function currentPeriod(now: Date = new Date()): TaskPeriod {
+  return periodForHour(now.getHours());
+}
+
+export function greetingForHour(hour: number): string {
   if (hour < 12) return 'Bom dia';
   if (hour < 18) return 'Boa tarde';
   return 'Boa noite';

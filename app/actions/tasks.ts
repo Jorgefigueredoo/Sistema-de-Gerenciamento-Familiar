@@ -8,9 +8,10 @@ import {
   WEEKDAYS,
   buildRecurrenceRule,
   isISODate,
-  todayISO,
+  todayISOIn,
   type WeekdayKey,
 } from '@/lib/dates';
+import { getTimeZone } from '@/lib/timezone';
 import { fail, type ActionResult } from '@/lib/action-result';
 import type { TaskPeriod } from '@/types';
 
@@ -69,7 +70,11 @@ export async function createTask(formData: FormData): Promise<ActionResult> {
   // O dia da semana escolhido no formulário chega já resolvido em data.
   // Recorrente não tem "um" dia: a regra é que manda, então fica em hoje.
   const date =
-    scope !== 'today' ? null : recurrenceRule || !isISODate(dateRaw) ? todayISO() : dateRaw;
+    scope !== 'today'
+      ? null
+      : recurrenceRule || !isISODate(dateRaw)
+        ? todayISOIn(getTimeZone())
+        : dateRaw;
 
   const supabase = createClient();
   const { error } = await supabase.from('tasks').insert({
@@ -98,10 +103,14 @@ export async function toggleTask(
   taskId: string,
   isRecurring: boolean,
   done: boolean,
-  date: string = todayISO(),
+  date?: string,
 ): Promise<ActionResult> {
   const session = await getSessionContext();
   if (!session) return fail('Sua sessão expirou. Entre novamente.');
+
+  // A tela sempre manda a data da ocorrência; o fallback existe só para
+  // não depender do relógio do servidor se algum chamador esquecer.
+  const day = isISODate(date) ? date : todayISOIn(getTimeZone());
 
   const supabase = createClient();
 
@@ -111,10 +120,10 @@ export async function toggleTask(
       ? await supabase
           .from('task_completions')
           .upsert(
-            { task_id: taskId, date, completed_by: session.userId },
+            { task_id: taskId, date: day, completed_by: session.userId },
             { onConflict: 'task_id,date' },
           )
-      : await supabase.from('task_completions').delete().eq('task_id', taskId).eq('date', date);
+      : await supabase.from('task_completions').delete().eq('task_id', taskId).eq('date', day);
 
     if (error) return fail(translate(error.message));
   } else {

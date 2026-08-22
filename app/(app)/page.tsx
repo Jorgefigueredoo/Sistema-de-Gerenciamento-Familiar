@@ -4,7 +4,16 @@ import { ErrorBanner } from '@/components/ErrorBanner';
 import { TaskSection } from '@/components/TaskSection';
 import { WeekAgenda } from '@/components/WeekAgenda';
 import { requireSession } from '@/lib/auth';
-import { addDays, describeWeek, isISODate, startOfWeek, todayISO } from '@/lib/dates';
+import {
+  addDays,
+  describeWeek,
+  greetingForHour,
+  hourIn,
+  isISODate,
+  startOfWeek,
+  todayISOIn,
+} from '@/lib/dates';
+import { getTimeZone } from '@/lib/timezone';
 import { getAgendaWeek, getOverdueTasks, getUndatedTasks } from '@/lib/tasks';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +25,9 @@ export default async function AgendaPage({
 }) {
   const session = await requireSession();
 
-  const today = todayISO();
+  // Fuso de quem está olhando, não o do servidor.
+  const timeZone = getTimeZone();
+  const today = todayISOIn(timeZone);
   // ?semana aceita qualquer data: o que importa é a semana em que ela cai.
   const reference = isISODate(searchParams.semana) ? searchParams.semana : today;
   const start = startOfWeek(reference);
@@ -41,6 +52,7 @@ export default async function AgendaPage({
         <DayHero
           name={firstName}
           date={today}
+          greeting={greetingForHour(hourIn(timeZone))}
           done={todayData.doneCount}
           total={todayData.tasks.length}
         />

@@ -4,7 +4,8 @@ import { ErrorBanner } from '@/components/ErrorBanner';
 import { PageTitle } from '@/components/PageTitle';
 import { TaskCard } from '@/components/TaskCard';
 import { requireSession } from '@/lib/auth';
-import { todayISO } from '@/lib/dates';
+import { todayISOIn } from '@/lib/dates';
+import { getTimeZone } from '@/lib/timezone';
 import { getDelegatedTasks } from '@/lib/tasks';
 import type { TaskView } from '@/lib/tasks';
 
@@ -13,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function DelegatedPage() {
   const session = await requireSession();
-  const today = todayISO();
+  const today = todayISOIn(getTimeZone());
   const { data: tasks, error } = await getDelegatedTasks(today);
 
   // Uma seção por pessoa: é assim que ela pensa ("o que o Pedro tem?").

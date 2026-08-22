@@ -1,6 +1,7 @@
 import { AppHeader } from '@/components/AppHeader';
 import { BottomNav } from '@/components/BottomNav';
 import { Sidebar } from '@/components/Sidebar';
+import { TimeZoneSync } from '@/components/TimeZoneSync';
 import { requireSession } from '@/lib/auth';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -33,6 +34,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </main>
 
       <BottomNav canCreate={canCreate} adminHref={adminHref} />
+
+      {/* Conta ao servidor em que fuso este navegador está. */}
+      <TimeZoneSync />
     </div>
   );
 }

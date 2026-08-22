@@ -1,14 +1,21 @@
-import { formatLongDate, greeting } from '@/lib/dates';
+import { formatLongDate } from '@/lib/dates';
 
 /** Cartão de abertura da Agenda: saudação, data e o anel de progresso. */
 export function DayHero({
   name,
   date,
+  greeting,
   done,
   total,
 }: {
   name: string;
   date: string;
+  /**
+   * Vem pronta da página. A saudação depende da hora de QUEM OLHA, e o
+   * relógio do servidor é UTC em produção — calcular aqui daria "boa
+   * noite" às 16h.
+   */
+  greeting: string;
   done: number;
   total: number;
 }) {
@@ -22,7 +29,7 @@ export function DayHero({
       : `${total - done} ${total - done === 1 ? 'tarefa restante' : 'tarefas restantes'}`;
 
   return (
-    <section className="relative overflow-hidden rounded-5xl border-2 border-hairline/70 bg-surface p-6 shadow-sticker">
+    <section className="relative overflow-hidden rounded-5xl border-2 border-hairline/70 bg-surface p-5 shadow-sticker sm:p-6">
       {/* Confete discreto: dá vida ao papel sem virar enfeite */}
       <span
         aria-hidden
@@ -33,14 +40,21 @@ export function DayHero({
         className="pointer-events-none absolute -bottom-16 -left-8 h-36 w-36 rounded-full bg-teal-200/30 blur-2xl"
       />
 
-      <div className="relative flex items-center justify-between gap-4">
-        <div className="min-w-0">
+      <div className="relative flex items-center justify-between gap-3 sm:gap-4">
+        <div className="min-w-0 flex-1">
           <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-ink-400">
             {formatLongDate(date)}
           </p>
-          <h1 className="mt-1.5 truncate text-[28px] font-extrabold leading-tight tracking-tight text-ink-900 sm:text-4xl">
-            {greeting()}, {name}
+
+          {/*
+            Saudação e nome em linhas separadas: juntos numa linha só, um
+            nome comprido era cortado no celular.
+          */}
+          <h1 className="mt-1.5 text-[22px] font-extrabold leading-[1.15] tracking-tight text-ink-900 sm:text-3xl">
+            <span className="block">{greeting},</span>
+            <span className="block break-words">{name}</span>
           </h1>
+
           <p className="mt-1.5 text-sm font-bold text-ink-500">{message}</p>
         </div>
 
@@ -67,7 +81,7 @@ function ProgressRing({
 
   return (
     <div
-      className="relative h-[92px] w-[92px] shrink-0"
+      className="relative h-[74px] w-[74px] shrink-0 sm:h-[92px] sm:w-[92px]"
       role="progressbar"
       aria-valuenow={percent}
       aria-valuemin={0}
@@ -99,8 +113,12 @@ function ProgressRing({
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="tabular text-xl font-extrabold leading-none text-ink-900">{done}</span>
-        <span className="tabular text-[11px] font-bold text-ink-400">de {total}</span>
+        <span className="tabular text-lg font-extrabold leading-none text-ink-900 sm:text-xl">
+          {done}
+        </span>
+        <span className="tabular text-[10px] font-bold text-ink-400 sm:text-[11px]">
+          de {total}
+        </span>
       </div>
     </div>
   );
