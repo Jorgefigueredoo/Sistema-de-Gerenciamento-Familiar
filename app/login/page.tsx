@@ -109,7 +109,7 @@ function LoginForm() {
 
       <Link
         href="/recuperar-senha"
-        className="mx-auto rounded-lg px-2 py-1 text-sm font-bold text-brand-600 transition hover:text-brand-700"
+        className="mx-auto rounded-lg px-2 py-1 text-sm font-extrabold text-ink-500 underline decoration-accent-400 decoration-2 underline-offset-4 transition hover:text-ink-900"
       >
         Esqueci minha senha
       </Link>
@@ -122,7 +122,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen flex-col justify-center px-5 py-10">
       <div className="mx-auto w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="surface-gradient mx-auto flex h-20 w-20 items-center justify-center rounded-4xl text-4xl shadow-glow">
+          <div className="surface-gradient mx-auto flex h-24 w-24 items-center justify-center rounded-5xl border-2 border-ink-900 text-5xl shadow-stickerLg">
             <span aria-hidden>🗓️</span>
           </div>
           <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-ink-900">
@@ -133,8 +133,8 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="rounded-4xl border border-white bg-white/90 p-6 shadow-lift backdrop-blur-sm">
-          <Suspense fallback={<div className="h-72 animate-pulse rounded-2xl bg-ink-100" />}>
+        <div className="rounded-5xl border-2 border-hairline/70 bg-surface p-6 shadow-stickerLg">
+          <Suspense fallback={<div className="h-72 animate-pulse rounded-2xl bg-sunken" />}>
             <LoginForm />
           </Suspense>
         </div>

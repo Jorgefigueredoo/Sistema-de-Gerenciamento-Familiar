@@ -3,7 +3,7 @@ export function ProgressSummary({ done, total }: { done: number; total: number }
   const finished = total > 0 && done === total;
 
   return (
-    <div className="mt-3 rounded-2xl border border-ink-200 bg-white p-4 shadow-sm">
+    <div className="mt-3 rounded-2xl border-2 border-hairline bg-surface p-4 shadow-sticker">
       <div className="flex items-baseline justify-between gap-2">
         <p className="text-sm font-semibold text-ink-700">
           {total === 0 ? (
@@ -19,7 +19,7 @@ export function ProgressSummary({ done, total }: { done: number; total: number }
       </div>
 
       <div
-        className="mt-2 h-2 overflow-hidden rounded-full bg-ink-100"
+        className="mt-2 h-2 overflow-hidden rounded-full bg-sunken"
         role="progressbar"
         aria-valuenow={percent}
         aria-valuemin={0}

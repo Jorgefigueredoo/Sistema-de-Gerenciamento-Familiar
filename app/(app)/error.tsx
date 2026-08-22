@@ -10,7 +10,7 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <div className="rounded-4xl border border-red-100 bg-white p-8 text-center shadow-soft">
+    <div className="rounded-5xl border-2 border-red-300 bg-surface p-8 text-center shadow-sticker">
       <div
         aria-hidden
         className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-red-50 text-3xl"

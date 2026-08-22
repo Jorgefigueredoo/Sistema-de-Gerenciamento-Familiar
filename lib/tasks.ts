@@ -1,6 +1,14 @@
 import { createClient } from '@/lib/supabase/server';
-import { recurrenceMatchesDate, todayISO } from '@/lib/dates';
-import type { Task, TaskPeriod } from '@/types';
+import {
+  formatShortDate,
+  getWeekday,
+  recurrenceMatchesDate,
+  todayISO,
+  weekDates,
+  weekdayOf,
+  type WeekdayKey,
+} from '@/lib/dates';
+import type { Task } from '@/types';
 
 /** Tarefa já resolvida para a tela: sabe quem é quem e se está feita HOJE. */
 export type TaskView = Task & {
@@ -61,95 +69,13 @@ function toView(row: Row, date: string, completions: Set<string>): TaskView {
 }
 
 // ---------------------------------------------------------------------
-// Tela Hoje
+// Tarefas sem dia marcado (scope "this_week")
+//
+// O destino "Essa semana" saiu do formulário quando a Agenda virou a tela
+// única. O que já estava nesse balde continua aparecendo num bloco à parte
+// da Agenda, para poder ganhar um dia. Quando esvaziar, o bloco some.
 // ---------------------------------------------------------------------
-export type TodayBoard = {
-  periods: Record<TaskPeriod, TaskView[]>;
-  /** Sem período definido — aparecem em "A qualquer hora". */
-  anytime: TaskView[];
-  /** Tarefas que outra pessoa delegou para o usuário atual. */
-  delegated: TaskView[];
-  /** Ficaram para trás em dias anteriores e continuam pendentes. */
-  overdue: TaskView[];
-  total: number;
-  doneCount: number;
-};
-
-export async function getTodayBoard(
-  userId: string,
-  date: string = todayISO(),
-): Promise<QueryResult<TodayBoard>> {
-  const supabase = createClient();
-
-  const [{ data, error }, completions] = await Promise.all([
-    supabase
-      .from('tasks')
-      .select(SELECT)
-      // "Hoje" reúne a agenda pessoal e o que foi delegado para mim.
-      // Tarefas delegadas não recebem data/período no cadastro, por isso
-      // precisam de uma condição separada da agenda datada.
-      .or(
-        `and(scope.eq.today,or(${mineFilter(userId)}),or(date.lte.${date},is_recurring.eq.true)),and(scope.eq.delegated,delegated_to.eq.${userId})`,
-      )
-      .order('time', { ascending: true, nullsFirst: false })
-      .order('created_at', { ascending: true }),
-    completionsFor(date),
-  ]);
-
-  const empty: TodayBoard = {
-    periods: { manha: [], tarde: [], noite: [] },
-    anytime: [],
-    delegated: [],
-    overdue: [],
-    total: 0,
-    doneCount: 0,
-  };
-
-  if (error) return { data: empty, error: friendlyError(error.message) };
-
-  const board = empty;
-
-  for (const row of (data ?? []) as unknown as Row[]) {
-    const view = toView(row, date, completions);
-
-    // Delegadas não têm um horário obrigatório: ficam numa lista própria
-    // para não se misturarem com a rotina que a pessoa criou para si.
-    if (row.scope === 'delegated') {
-      board.delegated.push(view);
-      continue;
-    }
-
-    // Recorrente entra apenas nos dias em que a regra cai.
-    if (row.is_recurring) {
-      if (!recurrenceMatchesDate(row.recurrence_rule, date)) continue;
-    } else if (row.date !== date) {
-      // Data passada: só continua se ficou pendente.
-      if (!view.overdue) continue;
-      board.overdue.push(view);
-      continue;
-    }
-
-    if (view.period) board.periods[view.period].push(view);
-    else board.anytime.push(view);
-  }
-
-  const doTasks = [
-    ...board.periods.manha,
-    ...board.periods.tarde,
-    ...board.periods.noite,
-    ...board.anytime,
-    ...board.delegated,
-  ];
-  board.total = doTasks.length;
-  board.doneCount = doTasks.filter((t) => t.done).length;
-
-  return { data: board, error: null };
-}
-
-// ---------------------------------------------------------------------
-// Tela Essa semana
-// ---------------------------------------------------------------------
-export async function getWeekTasks(
+export async function getUndatedTasks(
   userId: string,
   date: string = todayISO(),
 ): Promise<QueryResult<TaskView[]>> {
@@ -170,6 +96,34 @@ export async function getWeekTasks(
 
   const rows = (data ?? []) as unknown as Row[];
   return { data: rows.map((r) => toView(r, date, completions)), error: null };
+}
+
+// ---------------------------------------------------------------------
+// Atrasadas — o que ficou para trás antes da semana exibida
+//
+// Os dias passados da própria semana já aparecem na régua, então aqui
+// entram só os mais velhos que isso: sem esse bloco eles sumiriam de vista.
+// ---------------------------------------------------------------------
+export async function getOverdueTasks(
+  userId: string,
+  before: string,
+): Promise<QueryResult<TaskView[]>> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(SELECT)
+    .or(mineFilter(userId))
+    .eq('scope', 'today')
+    .eq('is_done', false)
+    .eq('is_recurring', false)
+    .lt('date', before)
+    .order('date', { ascending: true });
+
+  if (error) return { data: [], error: friendlyError(error.message) };
+
+  const rows = (data ?? []) as unknown as Row[];
+  return { data: rows.map((r) => toView(r, before, NO_COMPLETIONS)), error: null };
 }
 
 // ---------------------------------------------------------------------
@@ -195,6 +149,120 @@ export async function getDelegatedTasks(
 
   const rows = (data ?? []) as unknown as Row[];
   return { data: rows.map((r) => toView(r, date, completions)), error: null };
+}
+
+// ---------------------------------------------------------------------
+// Tela Agenda — a semana aberta dia a dia
+// ---------------------------------------------------------------------
+export type AgendaDay = {
+  date: string;
+  weekday: WeekdayKey;
+  /** "Segunda" */
+  label: string;
+  /** "Seg" */
+  short: string;
+  /** "25/08" */
+  dayMonth: string;
+  isToday: boolean;
+  isPast: boolean;
+  tasks: TaskView[];
+  doneCount: number;
+};
+
+export type AgendaWeek = {
+  start: string;
+  end: string;
+  days: AgendaDay[];
+  total: number;
+  doneCount: number;
+};
+
+const NO_COMPLETIONS: Set<string> = new Set();
+
+/** Conclusões de um intervalo inteiro, agrupadas por data. */
+async function completionsBetween(from: string, to: string): Promise<Map<string, Set<string>>> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from('task_completions')
+    .select('task_id, date')
+    .gte('date', from)
+    .lte('date', to);
+
+  const byDate = new Map<string, Set<string>>();
+  for (const row of data ?? []) {
+    const set = byDate.get(row.date) ?? new Set<string>();
+    set.add(row.task_id);
+    byDate.set(row.date, set);
+  }
+  return byDate;
+}
+
+/**
+ * Uma semana com as tarefas encaixadas em cada dia: as datadas caem no
+ * seu dia; as recorrentes se repetem em todos os dias que a regra alcança.
+ */
+export async function getAgendaWeek(
+  userId: string,
+  startISO: string,
+  today: string = todayISO(),
+): Promise<QueryResult<AgendaWeek>> {
+  const supabase = createClient();
+
+  const dates = weekDates(startISO);
+  const first = dates[0]!;
+  const last = dates[6]!;
+
+  const days: AgendaDay[] = dates.map((date) => {
+    const meta = getWeekday(weekdayOf(date));
+    return {
+      date,
+      weekday: meta.key,
+      label: meta.full,
+      short: meta.short,
+      dayMonth: formatShortDate(date),
+      isToday: date === today,
+      isPast: date < today,
+      tasks: [] as TaskView[],
+      doneCount: 0,
+    };
+  });
+
+  const week: AgendaWeek = { start: first, end: last, days, total: 0, doneCount: 0 };
+
+  const [{ data, error }, completions] = await Promise.all([
+    supabase
+      .from('tasks')
+      .select(SELECT)
+      .or(mineFilter(userId))
+      // Ou tem data dentro da semana, ou é recorrente — aí a regra diz o dia.
+      .or(`and(date.gte.${first},date.lte.${last}),is_recurring.eq.true`)
+      .order('time', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: true }),
+    completionsBetween(first, last),
+  ]);
+
+  if (error) return { data: week, error: friendlyError(error.message) };
+
+  for (const row of (data ?? []) as unknown as Row[]) {
+    for (const day of days) {
+      const belongsHere = row.is_recurring
+        ? recurrenceMatchesDate(row.recurrence_rule, day.date)
+        : row.date === day.date;
+      if (!belongsHere) continue;
+
+      const view = toView(row, day.date, completions.get(day.date) ?? NO_COMPLETIONS);
+      // Na agenda o atraso é medido contra hoje, não contra o dia da coluna.
+      day.tasks.push({ ...view, overdue: !view.done && !row.is_recurring && day.date < today });
+    }
+  }
+
+  for (const day of days) {
+    day.doneCount = day.tasks.filter((t) => t.done).length;
+    week.total += day.tasks.length;
+    week.doneCount += day.doneCount;
+  }
+
+  return { data: week, error: null };
 }
 
 // ---------------------------------------------------------------------

@@ -35,7 +35,7 @@ export function RolesManager({
             <button
               type="button"
               onClick={() => setEditing(role)}
-              className="pressable w-full rounded-3xl border border-white bg-white p-4 text-left shadow-soft transition hover:shadow-lift"
+              className="pressable w-full rounded-4xl border-2 border-hairline/70 bg-surface p-4 text-left shadow-sticker transition hover:-translate-y-0.5 hover:shadow-stickerLg"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="font-extrabold tracking-tight text-ink-900">{role.name}</p>
@@ -57,7 +57,7 @@ export function RolesManager({
                   .map((p) => (
                     <span
                       key={p.id}
-                      className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700 ring-1 ring-inset ring-brand-100"
+                      className="rounded-full bg-ink-900 px-2.5 py-1 text-[11px] font-extrabold text-paper-50"
                     >
                       {PERMISSION_LABELS[p.key] ?? p.key}
                     </span>
@@ -205,12 +205,12 @@ function PermissionEditor({
           const checked = selected.includes(permission.id);
           return (
             <li key={permission.id}>
-              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-ink-200 p-3.5 transition hover:border-brand-200 hover:bg-brand-50/40">
+              <label className="flex cursor-pointer items-start gap-3 rounded-3xl border-2 border-hairline p-3.5 transition hover:border-ink-900 hover:bg-accent-50/50">
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggle(permission.id)}
-                  className="mt-0.5 h-5 w-5 shrink-0 rounded-md border-ink-300 accent-brand-600"
+                  className="mt-0.5 h-5 w-5 shrink-0 rounded-md border-hairline accent-ink-900"
                 />
                 <span className="min-w-0">
                   <span className="block text-sm font-bold text-ink-800">

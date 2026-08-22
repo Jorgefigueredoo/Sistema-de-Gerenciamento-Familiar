@@ -46,7 +46,7 @@ export default function RecoverPasswordPage() {
           Enviamos um link para você criar uma senha nova.
         </p>
 
-        <div className="mt-6 rounded-4xl border border-white bg-white/90 p-6 shadow-lift backdrop-blur-sm">
+        <div className="mt-6 rounded-5xl border-2 border-hairline/70 bg-surface p-6 shadow-stickerLg">
           {sent ? (
             <div className="text-center">
               <p className="text-3xl" aria-hidden>
@@ -85,7 +85,7 @@ export default function RecoverPasswordPage() {
 
         <Link
           href="/login"
-          className="mt-6 block text-center text-sm font-bold text-brand-600 transition hover:text-brand-700"
+          className="mt-6 block text-center text-sm font-extrabold text-ink-500 underline decoration-accent-400 decoration-2 underline-offset-4 transition hover:text-ink-900"
         >
           ← Voltar para o login
         </Link>

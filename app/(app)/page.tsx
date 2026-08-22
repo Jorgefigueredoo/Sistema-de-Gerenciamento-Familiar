@@ -1,36 +1,52 @@
 import Link from 'next/link';
 import { DayHero } from '@/components/DayHero';
-import { EmptyState } from '@/components/EmptyState';
 import { ErrorBanner } from '@/components/ErrorBanner';
 import { TaskSection } from '@/components/TaskSection';
+import { WeekAgenda } from '@/components/WeekAgenda';
 import { requireSession } from '@/lib/auth';
-import { PERIODS } from '@/lib/categories';
-import { todayISO } from '@/lib/dates';
-import { getTodayBoard } from '@/lib/tasks';
+import { addDays, describeWeek, isISODate, startOfWeek, todayISO } from '@/lib/dates';
+import { getAgendaWeek, getOverdueTasks, getUndatedTasks } from '@/lib/tasks';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TodayPage({
+export default async function AgendaPage({
   searchParams,
 }: {
-  searchParams: { erro?: string };
+  searchParams: { semana?: string; erro?: string };
 }) {
   const session = await requireSession();
-  const today = todayISO();
-  const { data: board, error } = await getTodayBoard(session.userId, today);
 
-  const firstName = (session.profile.name || session.profile.email).split(' ')[0];
+  const today = todayISO();
+  // ?semana aceita qualquer data: o que importa é a semana em que ela cai.
+  const reference = isISODate(searchParams.semana) ? searchParams.semana : today;
+  const start = startOfWeek(reference);
+  const thisWeek = start === startOfWeek(today);
+
+  // Tudo numa rodada só. Os dois últimos existem para que nada fique
+  // invisível — o que venceu antes dessa semana e o que sobrou sem dia —
+  // e só fazem sentido (nem são buscados) na semana corrente.
+  const [{ data: week, error }, overdue, undated] = await Promise.all([
+    getAgendaWeek(session.userId, start, today),
+    thisWeek ? getOverdueTasks(session.userId, start) : Promise.resolve(null),
+    thisWeek ? getUndatedTasks(session.userId, today) : Promise.resolve(null),
+  ]);
+
   const canCreate = session.permissions.includes('create_task');
-  const canEditOthers = session.permissions.includes('edit_others_tasks');
-  const isEmpty = board.total === 0 && board.overdue.length === 0 && !error;
-  const hasPersonalTasks =
-    board.overdue.length > 0 ||
-    board.anytime.length > 0 ||
-    Object.values(board.periods).some((tasks) => tasks.length > 0);
+  const firstName = (session.profile.name || session.profile.email).split(' ')[0];
+  const todayData = week.days.find((d) => d.isToday);
 
   return (
     <>
-      <DayHero name={firstName} date={today} done={board.doneCount} total={board.total} />
+      {todayData ? (
+        <DayHero
+          name={firstName}
+          date={today}
+          done={todayData.doneCount}
+          total={todayData.tasks.length}
+        />
+      ) : (
+        <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">Agenda</h1>
+      )}
 
       <div className="mt-6">
         {searchParams.erro === 'sem-permissao' && (
@@ -40,99 +56,81 @@ export default async function TodayPage({
           />
         )}
 
-        <ErrorBanner message={error} className="mb-4" />
+        {/* Navegação entre semanas */}
+        <div className="mb-5 flex items-center gap-2">
+          <Link
+            href={`/?semana=${addDays(start, -7)}`}
+            aria-label="Semana anterior"
+            className="pressable touch-target flex items-center justify-center rounded-2xl border-2 border-hairline
+              bg-surface px-3.5 text-lg font-extrabold text-ink-500 shadow-sticker transition
+              hover:border-ink-900 hover:text-ink-900"
+          >
+            ‹
+          </Link>
 
-        {board.overdue.length > 0 && (
+          <p className="flex-1 text-center text-sm font-extrabold capitalize text-ink-600">
+            {describeWeek(start)}
+          </p>
+
+          <Link
+            href={`/?semana=${addDays(start, 7)}`}
+            aria-label="Próxima semana"
+            className="pressable touch-target flex items-center justify-center rounded-2xl border-2 border-hairline
+              bg-surface px-3.5 text-lg font-extrabold text-ink-500 shadow-sticker transition
+              hover:border-ink-900 hover:text-ink-900"
+          >
+            ›
+          </Link>
+        </div>
+
+        {!thisWeek && (
+          <div className="mb-5 text-center">
+            <Link
+              href="/"
+              className="pressable inline-flex items-center gap-1.5 rounded-full border-2 border-accent-400
+                bg-accent-100 px-4 py-2 text-xs font-extrabold text-ink-800 shadow-sticker"
+            >
+              ↩ Voltar para a semana de hoje
+            </Link>
+          </div>
+        )}
+
+        <ErrorBanner message={error} className="mb-4" />
+        <ErrorBanner message={overdue?.error ?? null} className="mb-4" />
+        <ErrorBanner message={undated?.error ?? null} className="mb-4" />
+
+        {/* Ficou para trás em semanas anteriores */}
+        {overdue && overdue.data.length > 0 && (
           <TaskSection
             title="Ficaram para trás"
             icon="⏰"
             tone="warning"
-            tasks={board.overdue}
+            tasks={overdue.data}
             date={today}
             canManage
-            canMoveToWeek
+            canMoveToDay
           />
         )}
 
-        {isEmpty ? (
-          <EmptyState
-            icon="☀️"
-            title="O dia está livre"
-            description={
-              canCreate
-                ? 'Que tal começar colocando a primeira tarefa do dia?'
-                : 'Nada foi delegado para você por enquanto.'
-            }
-          >
-            {canCreate && (
-              <Link
-                href="/nova-tarefa"
-                className="pressable surface-gradient inline-flex items-center gap-2 rounded-2xl px-5 py-3
-                  text-sm font-bold text-white shadow-glow"
-              >
-                + Nova tarefa
-              </Link>
-            )}
-          </EmptyState>
-        ) : (
-          <>
-            {hasPersonalTasks && (
-              <>
-                {/* No desktop os três períodos viram colunas lado a lado */}
-                <div className="lg:grid lg:grid-cols-3 lg:gap-x-6">
-                  <TaskSection
-                    title={PERIODS.manha.label}
-                    icon={PERIODS.manha.icon}
-                    tasks={board.periods.manha}
-                    date={today}
-                    emptyLabel="Manhã livre"
-                    canManage
-                    canMoveToWeek
-                  />
-                  <TaskSection
-                    title={PERIODS.tarde.label}
-                    icon={PERIODS.tarde.icon}
-                    tasks={board.periods.tarde}
-                    date={today}
-                    emptyLabel="Tarde livre"
-                    canManage
-                    canMoveToWeek
-                  />
-                  <TaskSection
-                    title={PERIODS.noite.label}
-                    icon={PERIODS.noite.icon}
-                    tasks={board.periods.noite}
-                    date={today}
-                    emptyLabel="Noite livre"
-                    canManage
-                    canMoveToWeek
-                  />
-                </div>
+        {/* key: trocar de semana começa de novo no primeiro dia */}
+        <WeekAgenda key={start} days={week.days} today={today} canCreate={canCreate} />
 
-                <TaskSection
-                  title="A qualquer hora"
-                  icon="✨"
-                  tasks={board.anytime}
-                  date={today}
-                  canManage
-                  canMoveToWeek
-                />
-              </>
-            )}
-
-            {board.delegated.length > 0 && (
-              <TaskSection
-                title="Delegadas para você"
-                icon="🤝"
-                tasks={board.delegated}
-                date={today}
-                showAuthor
-                // Quem recebeu pode concluir a tarefa; só quem tem a
-                // permissão administrativa também pode movê-la ou excluí-la.
-                canManage={canEditOthers}
-              />
-            )}
-          </>
+        {/* Herança do antigo "Essa semana": some sozinho quando esvaziar */}
+        {undated && undated.data.length > 0 && (
+          <div className="mt-8">
+            <TaskSection
+              title="Sem dia marcado"
+              icon="🗓️"
+              tasks={undated.data}
+              date={today}
+              canManage
+              canMoveToDay
+            />
+            <p className="-mt-4 text-xs font-medium text-ink-400">
+              Sobraram da tela “Essa semana”. Dê um dia a cada uma pelo menu ⋯ e esse bloco
+              desaparece.
+            </p>
+          </div>
         )}
       </div>
     </>

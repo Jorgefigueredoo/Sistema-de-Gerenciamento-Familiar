@@ -10,7 +10,7 @@ export function ErrorBanner({ message, className = '' }: Props) {
   return (
     <p
       role="alert"
-      className={`flex animate-fade-in items-start gap-2.5 rounded-2xl border border-red-100 bg-red-50 px-3.5 py-3 text-sm font-medium text-red-700 ${className}`}
+      className={`flex animate-fade-in items-start gap-2.5 rounded-3xl border-2 border-red-300 bg-red-100 px-3.5 py-3 text-sm font-bold text-red-800 ${className}`}
     >
       <span aria-hidden className="text-base leading-none">
         ⚠️

@@ -43,11 +43,11 @@ export function UsersManager({
         {users.map((user) => (
           <li
             key={user.id}
-            className="flex items-center gap-3 rounded-3xl border border-white bg-white p-3 shadow-soft transition hover:shadow-lift"
+            className="flex items-center gap-3 rounded-4xl border-2 border-hairline/70 bg-surface p-3 shadow-sticker transition hover:-translate-y-0.5 hover:shadow-stickerLg"
           >
             <span
               aria-hidden
-              className="surface-gradient flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              className="surface-gradient flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-ink-900 text-sm font-extrabold text-paper-50"
             >
               {(user.name || user.email).charAt(0).toUpperCase()}
             </span>
@@ -62,7 +62,7 @@ export function UsersManager({
               <p className="truncate text-xs text-ink-500">{user.email}</p>
             </div>
 
-            <span className="shrink-0 rounded-full bg-ink-100 px-2.5 py-1 text-[11px] font-bold text-ink-600">
+            <span className="shrink-0 rounded-full bg-sunken px-2.5 py-1 text-[11px] font-bold text-ink-600">
               {user.roleName ?? 'sem papel'}
             </span>
 
@@ -70,7 +70,7 @@ export function UsersManager({
               type="button"
               onClick={() => setEditing(user)}
               aria-label={`Editar ${user.name || user.email}`}
-              className="pressable touch-target flex shrink-0 items-center justify-center rounded-2xl text-lg text-ink-300 transition hover:bg-ink-100 hover:text-ink-600"
+              className="pressable touch-target flex shrink-0 items-center justify-center rounded-2xl text-lg text-ink-300 transition hover:bg-sunken hover:text-ink-600"
             >
               ⋯
             </button>
@@ -265,7 +265,7 @@ function EditUserForm({
           value={roleId}
           onChange={(e) => setRoleId(e.target.value)}
           disabled={isSelf}
-          className={`${INPUT} disabled:bg-ink-100 disabled:text-ink-400`}
+          className={`${INPUT} disabled:bg-sunken disabled:text-ink-400`}
         >
           <option value="">sem papel</option>
           {roles.map((role) => (
@@ -283,7 +283,7 @@ function EditUserForm({
 
       <ErrorBanner message={error} />
       {notice && (
-        <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <p className="rounded-2xl border-2 border-green-300 bg-green-100 px-3 py-2 text-sm font-bold text-green-800">
           {notice}
         </p>
       )}
@@ -292,7 +292,7 @@ function EditUserForm({
         Salvar alterações
       </Button>
 
-      <details className="rounded-xl border border-ink-200 p-3">
+      <details className="rounded-xl border border-hairline p-3">
         <summary className="cursor-pointer text-sm font-semibold text-ink-700">
           Definir uma senha nova
         </summary>

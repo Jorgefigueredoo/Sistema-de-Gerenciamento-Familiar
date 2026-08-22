@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: 'Sem conexão' };
 export default function OfflinePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white shadow-soft">
+      <div className="flex h-20 w-20 items-center justify-center rounded-4xl border-2 border-hairline bg-surface shadow-sticker">
         <span className="text-4xl" aria-hidden>
           📡
         </span>

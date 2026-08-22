@@ -2,14 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------
+   Superfícies em variáveis.
+
+   Antes o tema escuro era uma lista de classes literais (`html.dark
+   .bg-paper-50 { ... }`). Isso quebrava em silêncio para toda variante
+   com opacidade: `.bg-paper-50` e `.bg-paper-50/70` são seletores
+   diferentes, então o segundo continuava claro no escuro e o texto sumia.
+
+   Com variável, a cor troca na raiz e QUALQUER opacidade acompanha.
+   --------------------------------------------------------------------- */
 @layer base {
   :root {
     color-scheme: light;
+
+    --canvas: 253 246 236; /* fundo da página */
+    --surface: 255 252 247; /* cartão, superfície elevada */
+    --sunken: 242 237 229; /* preenchimento sutil, chip, skeleton */
+    --hairline: 230 222 210; /* bordas */
+    --veil: 26 22 16; /* realce sutil: tinta sobre o claro */
   }
 
   html.dark {
     color-scheme: dark;
-    background: #17141f;
+    background: #17130e;
+
+    --canvas: 26 22 16;
+    --surface: 36 30 24;
+    --sunken: 31 26 20;
+    --hairline: 58 49 40;
+    --veil: 255 246 235; /* no escuro o realce é luz, não tinta */
   }
 
   html {
@@ -22,22 +44,22 @@
   }
 
   body {
-    @apply bg-ink-50 text-ink-900 antialiased;
-    /* Brilho quente no topo: tira o ar de "planilha" do fundo chapado */
+    @apply bg-canvas text-ink-900 antialiased;
+    /* Papel quente com um leve grão de luz — nada de gradiente colorido. */
     background-image: radial-gradient(
-        90rem 40rem at 50% -20rem,
-        rgba(244, 63, 127, 0.16),
-        transparent 60%
+        70rem 34rem at 50% -16rem,
+        rgba(240, 176, 22, 0.13),
+        transparent 62%
       ),
-      radial-gradient(60rem 30rem at 100% 0%, rgba(139, 92, 246, 0.12), transparent 55%);
+      radial-gradient(46rem 26rem at 100% 4%, rgba(101, 72, 50, 0.07), transparent 58%);
     background-attachment: fixed;
     transition: background-color 220ms ease, color 220ms ease;
   }
 
   html.dark body {
-    @apply bg-ink-900 text-ink-100;
-    background-image: radial-gradient(70rem 36rem at 50% -18rem, rgba(225, 29, 98, 0.27), transparent 60%),
-      radial-gradient(60rem 32rem at 100% 0%, rgba(124, 58, 237, 0.22), transparent 55%);
+    @apply text-ink-100;
+    background-image: radial-gradient(70rem 34rem at 50% -16rem, rgba(240, 176, 22, 0.09), transparent 62%),
+      radial-gradient(46rem 26rem at 100% 4%, rgba(210, 148, 8, 0.05), transparent 58%);
   }
 
   /* Tipografia com números alinhados: contadores não "dançam" */
@@ -46,7 +68,7 @@
   }
 
   ::selection {
-    @apply bg-brand-200 text-brand-900;
+    @apply bg-accent-200 text-ink-900;
   }
 }
 
@@ -57,95 +79,76 @@
   }
 
   .card {
-    @apply rounded-3xl border border-white/70 bg-white/90 shadow-soft backdrop-blur-sm;
+    @apply rounded-4xl border-2 border-hairline/70 bg-surface shadow-sticker;
   }
 
   .field {
-    @apply w-full rounded-2xl border border-ink-200 bg-white px-4 py-3 text-base text-ink-900
-      placeholder:text-ink-400 transition
-      focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-100;
+    @apply w-full rounded-3xl border-2 border-hairline bg-surface px-4 py-3 text-base font-medium text-ink-900
+      placeholder:font-normal placeholder:text-ink-400 transition
+      focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-accent-200/60;
   }
 
   .label {
-    @apply mb-1.5 block text-sm font-semibold text-ink-700;
+    @apply mb-2 block text-[13px] font-extrabold uppercase tracking-wider text-ink-500;
   }
 
+  /*
+   * Tinta: o que é ação do app, não conteúdo. No escuro ela clareia em vez
+   * de virar dourado — assim o texto creme por cima continua legível.
+   */
   .surface-gradient {
-    background-image: linear-gradient(135deg, #e11d62 0%, #d0219a 45%, #7c3aed 100%);
+    background-image: linear-gradient(150deg, #4c3625 0%, #33241a 55%, #211710 100%);
+  }
+
+  html.dark .surface-gradient {
+    background-image: linear-gradient(150deg, #6b4d34 0%, #574026 55%, #46331f 100%);
   }
 
   /* Botão/chip que reage ao toque como app nativo */
   .pressable {
-    @apply transition duration-150 active:scale-[0.97];
+    @apply transition duration-150 active:translate-y-px active:scale-[0.985];
   }
 }
 
-/* Tema escuro: superfícies quentes, com contraste sem o preto absoluto. */
-html.dark .bg-white,
-html.dark [class~='bg-white/60'],
-html.dark [class~='bg-white/70'],
-html.dark [class~='bg-white/80'],
-html.dark [class~='bg-white/85'],
-html.dark [class~='bg-white/90'] {
-  background-color: rgba(42, 37, 52, 0.92) !important;
-}
-
-html.dark .bg-ink-50,
-html.dark [class~='bg-ink-50/60'] {
-  background-color: #211d29 !important;
-}
-
-html.dark .bg-ink-100 {
-  background-color: #302a3a !important;
-}
-
-html.dark .border-white,
-html.dark [class~='border-white/60'],
-html.dark [class~='border-white/70'],
-html.dark [class~='border-white/80'],
-html.dark .border-ink-100,
-html.dark .border-ink-200,
-html.dark .border-dashed {
-  border-color: rgba(255, 255, 255, 0.11) !important;
-}
-
+/* ---------------------------------------------------------------------
+   O que ainda depende de classe literal: só a escala de TEXTO, que não
+   tem variante com opacidade em nenhum lugar do app.
+   --------------------------------------------------------------------- */
 html.dark .text-ink-900,
 html.dark .text-ink-800 {
-  color: #fbf9ff !important;
+  color: #fdf8f1;
 }
 
 html.dark .text-ink-700,
 html.dark .text-ink-600 {
-  color: #ddd6e8 !important;
+  color: #e4dacd;
 }
 
 html.dark .text-ink-500 {
-  color: #b6afc2 !important;
+  color: #b9ab9a;
 }
 
 html.dark .text-ink-400,
 html.dark .text-ink-300 {
-  color: #938ca0 !important;
-}
-
-html.dark .field {
-  @apply border-white/10 bg-ink-800 text-ink-100 placeholder:text-ink-500;
-}
-
-html.dark .card {
-  @apply border-white/10 bg-ink-800/90;
-}
-
-html.dark .bg-brand-50 {
-  background-color: rgba(225, 29, 98, 0.16) !important;
+  color: #948676;
 }
 
 html.dark .bg-accent-50 {
-  background-color: rgba(124, 58, 237, 0.18) !important;
+  background-color: rgba(240, 176, 22, 0.16);
 }
 
-html.dark .bg-emerald-50 {
-  background-color: rgba(16, 185, 129, 0.14) !important;
+html.dark .bg-brand-50 {
+  background-color: rgba(240, 176, 22, 0.14);
+}
+
+/*
+ * Cartão de tarefa no escuro: o tom claro da categoria viraria um bloco
+ * ofuscante, então ele cede lugar à superfície e a cor fica na bolha do
+ * ícone e no chip, que já são sólidos.
+ */
+html.dark [data-tinted] {
+  background-color: rgb(var(--surface));
+  border-color: rgb(var(--hairline));
 }
 
 @layer utilities {

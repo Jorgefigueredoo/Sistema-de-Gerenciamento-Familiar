@@ -15,14 +15,14 @@ export function PageTitle({
         {emoji && (
           <span
             aria-hidden
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-xl shadow-soft"
+            className="flex h-12 w-12 items-center justify-center rounded-3xl border-2 border-hairline bg-surface text-xl shadow-sticker"
           >
             {emoji}
           </span>
         )}
         <div className="min-w-0">
           <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">{title}</h1>
-          {subtitle && <p className="mt-0.5 text-sm text-ink-500">{subtitle}</p>}
+          {subtitle && <p className="mt-0.5 text-sm font-medium text-ink-500">{subtitle}</p>}
         </div>
       </div>
       {children}

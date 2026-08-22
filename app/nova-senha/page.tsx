@@ -59,9 +59,9 @@ export default function NewPasswordPage() {
         <h1 className="text-3xl font-extrabold tracking-tight text-ink-900">Nova senha</h1>
         <p className="mt-1.5 text-sm text-ink-500">Escolha uma senha que você lembre.</p>
 
-        <div className="mt-6 rounded-4xl border border-white bg-white/90 p-6 shadow-lift backdrop-blur-sm">
+        <div className="mt-6 rounded-5xl border-2 border-hairline/70 bg-surface p-6 shadow-stickerLg">
           {checking ? (
-            <div className="h-40 animate-pulse rounded-2xl bg-ink-100" />
+            <div className="h-40 animate-pulse rounded-2xl bg-sunken" />
           ) : !hasSession ? (
             <ErrorBanner message="Este link expirou ou já foi usado. Peça um novo em “Esqueci minha senha”." />
           ) : (

@@ -25,7 +25,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       { name: 'Nova tarefa', short_name: 'Nova', url: '/nova-tarefa' },
-      { name: 'Essa semana', short_name: 'Semana', url: '/semana' },
+      { name: 'Agenda', short_name: 'Agenda', url: '/' },
       { name: 'Delegado', short_name: 'Delegado', url: '/delegado' },
     ],
   };

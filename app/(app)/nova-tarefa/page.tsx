@@ -4,6 +4,7 @@ import { PageTitle } from '@/components/PageTitle';
 import { TaskForm } from '@/components/TaskForm';
 import { requireSession } from '@/lib/auth';
 import { isScope } from '@/lib/categories';
+import { isISODate } from '@/lib/dates';
 import { getDelegateOptions } from '@/lib/tasks';
 
 export const metadata = { title: 'Nova tarefa' };
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export default async function NewTaskPage({
   searchParams,
 }: {
-  searchParams: { destino?: string };
+  searchParams: { destino?: string; dia?: string };
 }) {
   const session = await requireSession();
 
@@ -23,6 +24,7 @@ export default async function NewTaskPage({
   const delegates = await getDelegateOptions(session.userId);
   const destino = searchParams.destino;
   const defaultScope = isScope(destino) ? destino : 'today';
+  const defaultDate = isISODate(searchParams.dia) ? searchParams.dia : undefined;
 
   return (
     <>
@@ -30,13 +32,13 @@ export default async function NewTaskPage({
         <PageTitle emoji="✨" title="Nova tarefa" />
         <Link
           href="/"
-          className="pressable touch-target flex items-center rounded-2xl px-3 text-sm font-bold text-ink-400 transition hover:bg-ink-100 hover:text-ink-700"
+          className="pressable touch-target flex items-center rounded-2xl px-3 text-sm font-bold text-ink-400 transition hover:bg-sunken hover:text-ink-700"
         >
           Cancelar
         </Link>
       </div>
 
-      <TaskForm delegates={delegates} defaultScope={defaultScope} />
+      <TaskForm delegates={delegates} defaultScope={defaultScope} defaultDate={defaultDate} />
     </>
   );
 }

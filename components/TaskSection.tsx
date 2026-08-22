@@ -11,8 +11,7 @@ type Props = {
   showDelegate?: boolean;
   showAuthor?: boolean;
   canManage?: boolean;
-  canMoveToToday?: boolean;
-  canMoveToWeek?: boolean;
+  canMoveToDay?: boolean;
 };
 
 export function TaskSection({
@@ -35,26 +34,26 @@ export function TaskSection({
         {icon && (
           <span
             aria-hidden
-            className={`flex h-8 w-8 items-center justify-center rounded-xl text-base shadow-soft
-              ${tone === 'warning' ? 'bg-red-50' : 'bg-white'}`}
+            className={`flex h-9 w-9 items-center justify-center rounded-2xl border-2 text-base shadow-sticker
+              ${tone === 'warning' ? 'border-red-300 bg-red-100' : 'border-hairline bg-surface'}`}
           >
             {icon}
           </span>
         )}
 
         <h2
-          className={`text-sm font-extrabold tracking-tight
-            ${tone === 'warning' ? 'text-red-600' : 'text-ink-700'}`}
+          className={`text-xs font-extrabold uppercase tracking-wider
+            ${tone === 'warning' ? 'text-red-700' : 'text-ink-500'}`}
         >
           {title}
         </h2>
 
-        <span className="h-px flex-1 bg-ink-200/70" aria-hidden />
+        <span className="h-0.5 flex-1 rounded-full bg-hairline" aria-hidden />
 
         {tasks.length > 0 && (
           <span
-            className={`tabular rounded-full px-2 py-0.5 text-[11px] font-bold
-              ${complete ? 'bg-emerald-50 text-emerald-600' : 'bg-ink-100 text-ink-500'}`}
+            className={`tabular rounded-full px-2.5 py-1 text-[11px] font-extrabold
+              ${complete ? 'bg-green-500 text-white' : 'bg-ink-900 text-paper-50'}`}
           >
             {doneCount}/{tasks.length}
           </span>
@@ -68,7 +67,7 @@ export function TaskSection({
           ))}
         </ul>
       ) : (
-        <p className="rounded-3xl border border-dashed border-ink-200 px-4 py-5 text-center text-sm font-medium text-ink-400">
+        <p className="rounded-4xl border-2 border-dashed border-hairline px-4 py-5 text-center text-sm font-bold text-ink-400">
           {emptyLabel}
         </p>
       )}

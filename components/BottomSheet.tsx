@@ -39,7 +39,7 @@ export function BottomSheet({ open, title, onClose, children }: Props) {
         type="button"
         aria-label="Fechar"
         onClick={onClose}
-        className="absolute inset-0 animate-fade-in bg-ink-900/40 backdrop-blur-sm"
+        className="absolute inset-0 animate-fade-in bg-ink-900/50 backdrop-blur-sm"
       />
 
       <div
@@ -47,7 +47,7 @@ export function BottomSheet({ open, title, onClose, children }: Props) {
         aria-modal="true"
         aria-label={title}
         className="safe-bottom relative max-h-[88vh] w-full max-w-lg animate-slide-up overflow-y-auto
-          rounded-t-4xl bg-white p-5 pb-8 shadow-lift sm:rounded-4xl sm:pb-5"
+          rounded-t-5xl border-2 border-hairline/70 bg-surface p-5 pb-8 shadow-lift sm:rounded-5xl sm:pb-5"
       >
         <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-ink-200 sm:hidden" aria-hidden />
 
@@ -58,7 +58,7 @@ export function BottomSheet({ open, title, onClose, children }: Props) {
             onClick={onClose}
             aria-label="Fechar"
             className="pressable -mr-1 -mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full
-              bg-ink-100 text-lg leading-none text-ink-500 transition hover:bg-ink-200"
+              border-2 border-hairline bg-surface text-lg leading-none text-ink-500 transition hover:border-ink-900 hover:text-ink-900"
           >
             ×
           </button>

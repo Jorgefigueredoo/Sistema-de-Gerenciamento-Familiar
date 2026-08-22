@@ -16,8 +16,7 @@ Só quem for cadastrado por um administrador entra. Cada pessoa tem um **papel**
 ├── app/
 │   ├── (app)/                  # área logada (header + navegação inferior)
 │   │   ├── layout.tsx
-│   │   ├── page.tsx            # Hoje
-│   │   ├── semana/
+│   │   ├── page.tsx            # Agenda — a semana dia a dia
 │   │   ├── delegado/
 │   │   ├── nova-tarefa/
 │   │   └── admin/
@@ -231,10 +230,9 @@ As telas `/admin/*` são bloqueadas no servidor antes de renderizar (`requirePer
 | Rota               | O que faz                                                                |
 | ------------------ | ------------------------------------------------------------------------ |
 | `/login`           | e-mail + senha, com "esqueci minha senha"                                |
-| `/`                | **Hoje** — tarefas do dia em Manhã / Tarde / Noite, com contador          |
-| `/semana`          | **Essa semana** — tarefas sem data ainda, com ação de mover para hoje     |
+| `/`                | **Agenda** — a semana dia a dia: régua dos 7 dias, troca de semana, atrasadas |
 | `/delegado`        | **Delegado** — o que foi passado para outra pessoa e o status de cada uma |
-| `/nova-tarefa`     | criação rápida: título, categoria, destino, período, horário, recorrência |
+| `/nova-tarefa`     | criação rápida: título, categoria, dia da semana, período, horário, recorrência |
 | `/admin/usuarios`  | pessoas da família e seus papéis — exige `manage_users`                   |
 | `/admin/papeis`    | papéis e checkboxes de permissão — exige `manage_roles`                   |
 
@@ -286,11 +284,14 @@ roles ──< role_permissions >── permissions
 
 Campos de `tasks` que valem explicação:
 
-- `scope`: `today` (é para hoje) · `this_week` (é para essa semana, sem data ainda) · `delegated` (é de outra pessoa)
-- `period`: `manha` · `tarde` · `noite` — define o bloco na tela Hoje
+- `scope`: `today` (tem dia marcado — o nome é histórico, o dia mora em `date`) · `delegated` (é de outra pessoa) · `this_week` (legado: sem dia, ver abaixo)
+- `period`: `manha` · `tarde` · `noite` — usado para ordenar dentro do dia
+- `date`: o dia em que a tarefa acontece. O formulário pergunta o **dia da semana** e resolve para a próxima data em que ele cai — é isso que a Agenda usa para encaixar a tarefa na coluna certa
 - `recurrence_rule`: `"weekly:mon,wed,fri"` — dias da semana em que a tarefa se repete
 
-**Sobre as recorrentes:** uma tarefa que se repete não é copiada para cada dia. Ela é uma linha só, e a tela Hoje calcula na hora se a regra cai no dia atual. Por isso o `is_done` não serve para ela — se marcasse na segunda, apareceria já concluída na quarta. A conclusão de cada dia vira uma linha em `task_completions`, o que ainda dá um histórico de "quantas vezes treinei esse mês" de graça.
+**Sobre o `this_week`:** a tela "Essa semana" foi removida quando a Agenda virou a tela única — toda tarefa nova nasce com um dia ou delegada. As linhas que já existiam com esse `scope` aparecem num bloco "Sem dia marcado" no fim da Agenda, para receberem um dia pelo menu ⋯. Quando o bloco esvaziar, ele some sozinho e o `scope` pode ser aposentado do schema.
+
+**Sobre as recorrentes:** uma tarefa que se repete não é copiada para cada dia. Ela é uma linha só, e as telas Hoje e Agenda calculam na hora se a regra cai naquele dia. Por isso o `is_done` não serve para ela — se marcasse na segunda, apareceria já concluída na quarta. A conclusão de cada dia vira uma linha em `task_completions`, o que ainda dá um histórico de "quantas vezes treinei esse mês" de graça.
 
 ---
 

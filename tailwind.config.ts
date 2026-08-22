@@ -6,55 +6,81 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Rosa da marca
+        /**
+         * Superfícies dirigidas por variável CSS. O tema escuro troca a
+         * variável, então QUALQUER opacidade (`bg-surface/70`) acompanha
+         * sozinha — o que uma lista de classes literais nunca cobriria.
+         */
+        canvas: 'rgb(var(--canvas) / <alpha-value>)',
+        surface: 'rgb(var(--surface) / <alpha-value>)',
+        sunken: 'rgb(var(--sunken) / <alpha-value>)',
+        hairline: 'rgb(var(--hairline) / <alpha-value>)',
+        /** Véu para realces sutis: tinta no claro, luz no escuro. */
+        veil: 'rgb(var(--veil) / <alpha-value>)',
+
+        /**
+         * A cor do app vem das categorias. O "chrome" (botões, seleção,
+         * navegação) é tinta quente quase preta, para não brigar com elas
+         * e para o app não ter cara de template de framework.
+         */
         brand: {
-          50: '#fff1f6',
-          100: '#ffe4ee',
-          200: '#fecdde',
-          300: '#fda4c4',
-          400: '#fb6fa2',
-          500: '#f43f7f',
-          600: '#e11d62',
-          700: '#be1250',
-          800: '#9d1246',
-          900: '#851340',
+          50: '#faf6f1',
+          100: '#f1e8dd',
+          200: '#e0cfba',
+          300: '#c6ad90',
+          400: '#a68465',
+          500: '#836248',
+          600: '#654832',
+          700: '#4c3625',
+          800: '#33241a',
+          900: '#211710',
         },
-        // Violeta de apoio, usado nos gradientes
+        // Dourado de apoio: usado só em destaques pequenos ("hoje", foco).
         accent: {
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed',
-          700: '#6d28d9',
+          50: '#fff9e8',
+          100: '#ffefc4',
+          200: '#ffdf8f',
+          300: '#fcc94f',
+          400: '#f0b016',
+          500: '#d29408',
+          600: '#a97406',
+          700: '#845a06',
         },
-        // Neutros levemente quentes: menos frios que o slate puro
+        // Papel: o fundo é creme, não o cinza-azulado de sempre.
+        paper: {
+          50: '#fffcf7',
+          100: '#fdf6ec',
+          200: '#f8eddd',
+          300: '#f0e0c9',
+        },
+        // Neutros quentes, puxados para o marrom em vez do azul.
         ink: {
-          50: '#f9f8fb',
-          100: '#f2f0f6',
-          200: '#e7e4ee',
-          300: '#d3cfdd',
-          400: '#a29db2',
-          500: '#7b7589',
-          600: '#5b5568',
-          700: '#443f4f',
-          800: '#2d2937',
-          900: '#1b1822',
+          50: '#faf7f3',
+          100: '#f2ede5',
+          200: '#e6ded2',
+          300: '#d2c5b5',
+          400: '#a79a89',
+          500: '#7d7163',
+          600: '#5c5246',
+          700: '#443c32',
+          800: '#2c261e',
+          900: '#1a1610',
         },
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        soft: '0 1px 2px rgba(27, 24, 34, 0.04), 0 4px 16px -4px rgba(27, 24, 34, 0.08)',
-        lift: '0 2px 4px rgba(27, 24, 34, 0.04), 0 12px 32px -8px rgba(27, 24, 34, 0.14)',
-        glow: '0 8px 24px -6px rgba(225, 29, 98, 0.45)',
-        nav: '0 -1px 2px rgba(27, 24, 34, 0.03), 0 -8px 32px -12px rgba(27, 24, 34, 0.18)',
+        // "Adesivo": uma aba sólida embaixo, sem o borrão genérico.
+        sticker: '0 3px 0 0 rgb(58 42 26 / 0.10), 0 8px 20px -12px rgb(58 42 26 / 0.45)',
+        stickerLg: '0 5px 0 0 rgb(58 42 26 / 0.12), 0 16px 32px -16px rgb(58 42 26 / 0.5)',
+        soft: '0 1px 2px rgb(58 42 26 / 0.05), 0 4px 14px -6px rgb(58 42 26 / 0.14)',
+        lift: '0 2px 4px rgb(58 42 26 / 0.06), 0 14px 34px -12px rgb(58 42 26 / 0.28)',
+        nav: '0 -2px 24px -10px rgb(58 42 26 / 0.35)',
       },
       borderRadius: {
-        '4xl': '2rem',
+        '4xl': '1.75rem',
+        '5xl': '2.25rem',
       },
       keyframes: {
         'slide-up': {
@@ -70,12 +96,13 @@ const config: Config = {
           '70%': { transform: 'scale(1.08)' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
-        'rise': {
+        rise: {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
-        'shimmer': {
-          '100%': { transform: 'translateX(100%)' },
+        festa: {
+          '0%,100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
         },
       },
       animation: {
@@ -83,6 +110,7 @@ const config: Config = {
         'fade-in': 'fade-in 180ms ease-out',
         'pop-in': 'pop-in 240ms cubic-bezier(0.22, 1, 0.36, 1)',
         rise: 'rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both',
+        festa: 'festa 500ms ease-in-out',
       },
     },
   },

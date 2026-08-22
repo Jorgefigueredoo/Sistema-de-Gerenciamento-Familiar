@@ -5,9 +5,19 @@ import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { ErrorBanner } from '@/components/ErrorBanner';
-import { getCategory, PERIOD_LIST } from '@/lib/categories';
-import { describeRecurrence, formatShortDate, formatTime } from '@/lib/dates';
-import { deleteTask, moveTaskToToday, moveTaskToWeek, toggleTask } from '@/app/actions/tasks';
+import { getCategory } from '@/lib/categories';
+import {
+  WEEKDAYS,
+  describeRecurrence,
+  formatLongDate,
+  formatShortDate,
+  formatTime,
+  nextDateForWeekday,
+  todayISO,
+  weekdayOf,
+  type WeekdayKey,
+} from '@/lib/dates';
+import { deleteTask, moveTaskToDay, toggleTask } from '@/app/actions/tasks';
 import type { TaskView } from '@/lib/tasks';
 
 type Props = {
@@ -20,10 +30,8 @@ type Props = {
   showAuthor?: boolean;
   /** Habilita mover/excluir. */
   canManage?: boolean;
-  /** Oferece "mover para hoje" (tela Essa semana). */
-  canMoveToToday?: boolean;
-  /** Oferece "deixar para essa semana" (tela Hoje). */
-  canMoveToWeek?: boolean;
+  /** Oferece "mover para outro dia". */
+  canMoveToDay?: boolean;
   /** Atraso da animação de entrada, para a lista aparecer em cascata. */
   index?: number;
 };
@@ -34,8 +42,7 @@ export function TaskCard({
   showDelegate = false,
   showAuthor = false,
   canManage = false,
-  canMoveToToday = false,
-  canMoveToWeek = false,
+  canMoveToDay = false,
   index = 0,
 }: Props) {
   const category = getCategory(task.category);
@@ -43,7 +50,7 @@ export function TaskCard({
   const [done, setDone] = useState(task.done);
   const [error, setError] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [moveOpen, setMoveOpen] = useState(false);
+  const [dayOpen, setDayOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function handleToggle() {
@@ -67,75 +74,78 @@ export function TaskCard({
       if (!result.ok) setError(result.error ?? 'Não foi possível concluir a ação.');
       else {
         setMenuOpen(false);
-        setMoveOpen(false);
+        setDayOpen(false);
       }
     });
   }
 
   const time = formatTime(task.time);
   const recurrence = describeRecurrence(task.recurrence_rule);
-  const hasMenu = canManage || canMoveToToday || canMoveToWeek;
+  const hasMenu = canManage || canMoveToDay;
 
   return (
     <li
+      data-tinted={done ? undefined : ''}
       style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
-      className={`group animate-rise rounded-3xl border bg-white transition duration-300
+      className={`group animate-rise rounded-4xl border-2 transition duration-300
         ${
           done
-            ? 'border-ink-100 bg-ink-50/60 shadow-none'
-            : 'border-white shadow-soft hover:-translate-y-0.5 hover:shadow-lift'
+            ? 'border-hairline/60 bg-sunken/70 shadow-none'
+            : `${category.card} shadow-sticker hover:-translate-y-0.5 hover:shadow-stickerLg`
         }`}
     >
-      <div className="flex items-start gap-3 p-3.5">
-        <Checkbox
-          checked={done}
-          onChange={handleToggle}
-          label={done ? `Desmarcar ${task.title}` : `Concluir ${task.title}`}
-          color={category.solid}
-        />
+      <div className="flex items-start gap-3 p-4">
+        {/* Bolha da categoria: identifica a área da vida antes de ler o texto */}
+        <span
+          aria-hidden
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xl
+            shadow-sticker transition duration-300
+            ${done ? 'bg-ink-200 grayscale' : `${category.bubble} group-hover:animate-festa`}`}
+        >
+          {category.icon}
+        </span>
 
-        <div className="min-w-0 flex-1 pt-0.5">
+        <div className="min-w-0 flex-1">
           <p
-            className={`break-words text-[15px] font-semibold leading-snug transition duration-300
-              ${done ? 'text-ink-400 line-through decoration-ink-300' : 'text-ink-900'}`}
+            className={`break-words text-[16px] font-bold leading-snug transition duration-300
+              ${done ? 'text-ink-400 line-through decoration-ink-300 decoration-2' : 'text-ink-900'}`}
           >
             {task.title}
           </p>
 
           <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-semibold ${category.chip}`}
+              className={`inline-flex items-center rounded-full px-2.5 py-1 font-extrabold ${category.chip}`}
             >
-              <span aria-hidden>{category.icon}</span>
               {category.label}
             </span>
 
             {time && (
-              <span className="tabular inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-1 font-semibold text-ink-600">
+              <span className="tabular inline-flex items-center gap-1 rounded-full bg-veil/[0.07] px-2.5 py-1 font-extrabold text-ink-700">
                 🕐 {time}
               </span>
             )}
 
             {task.overdue && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 font-semibold text-red-600 ring-1 ring-inset ring-red-100">
+              <span className="inline-flex items-center gap-1 rounded-full bg-red-500 px-2.5 py-1 font-extrabold text-white">
                 ⏰ {task.date ? formatShortDate(task.date) : 'atrasada'}
               </span>
             )}
 
             {recurrence && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-1 font-medium text-ink-500">
+              <span className="inline-flex items-center gap-1 rounded-full bg-veil/[0.07] px-2.5 py-1 font-bold text-ink-600">
                 🔁 {recurrence}
               </span>
             )}
 
             {showDelegate && task.delegate && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-accent-50 px-2 py-1 font-semibold text-accent-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-2.5 py-1 font-extrabold text-paper-50">
                 👤 {task.delegate.name}
               </span>
             )}
 
             {showAuthor && task.author && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-1 font-medium text-ink-500">
+              <span className="inline-flex items-center gap-1 rounded-full bg-veil/[0.07] px-2.5 py-1 font-bold text-ink-600">
                 ✍️ {task.author.name}
               </span>
             )}
@@ -144,13 +154,22 @@ export function TaskCard({
           {error && <ErrorBanner message={error} className="mt-2" />}
         </div>
 
+        <div className="flex shrink-0 flex-col items-center gap-2 pt-0.5">
+          <Checkbox
+            checked={done}
+            onChange={handleToggle}
+            label={done ? `Desmarcar ${task.title}` : `Concluir ${task.title}`}
+            color={category.solid}
+          />
+        </div>
+
         {hasMenu && (
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label={`Opções de ${task.title}`}
-            className="pressable touch-target -mr-1 -mt-1 flex items-center justify-center rounded-2xl text-lg
-              text-ink-300 transition hover:bg-ink-100 hover:text-ink-600"
+            className="pressable touch-target -mr-2 -mt-2 flex items-center justify-center rounded-2xl text-xl
+              font-bold text-ink-400 transition hover:bg-veil/[0.07] hover:text-ink-800"
           >
             ⋯
           </button>
@@ -160,27 +179,16 @@ export function TaskCard({
       {/* Menu de opções */}
       <BottomSheet open={menuOpen} title={task.title} onClose={() => setMenuOpen(false)}>
         <div className="flex flex-col gap-2">
-          {canMoveToToday && (
+          {canMoveToDay && (
             <Button
               variant="secondary"
               full
               onClick={() => {
                 setMenuOpen(false);
-                setMoveOpen(true);
+                setDayOpen(true);
               }}
             >
-              📅 Mover para hoje
-            </Button>
-          )}
-
-          {canMoveToWeek && (
-            <Button
-              variant="secondary"
-              full
-              loading={pending}
-              onClick={() => run(() => moveTaskToWeek(task.id))}
-            >
-              🗓️ Deixar para essa semana
+              📆 Mover para outro dia
             </Button>
           )}
 
@@ -201,74 +209,74 @@ export function TaskCard({
         </div>
       </BottomSheet>
 
-      {/* Mover para hoje: escolhe período e horário */}
-      <BottomSheet open={moveOpen} title="Quando, hoje?" onClose={() => setMoveOpen(false)}>
-        <MoveToTodayForm
+      {/* Mover para outro dia da semana */}
+      <BottomSheet open={dayOpen} title="Para qual dia?" onClose={() => setDayOpen(false)}>
+        <MoveToDayForm
+          current={task.date}
           pending={pending}
           error={error}
-          onSubmit={(period, time) => run(() => moveTaskToToday(task.id, period, time))}
+          onSubmit={(date) => run(() => moveTaskToDay(task.id, date))}
         />
       </BottomSheet>
+
     </li>
   );
 }
 
-function MoveToTodayForm({
+function MoveToDayForm({
+  current,
   pending,
   error,
   onSubmit,
 }: {
+  current: string | null;
   pending: boolean;
   error: string | null;
-  onSubmit: (period: string, time: string | null) => void;
+  onSubmit: (date: string) => void;
 }) {
-  const [period, setPeriod] = useState<string>('manha');
-  const [time, setTime] = useState('');
+  const today = todayISO();
+  const [key, setKey] = useState<WeekdayKey>(weekdayOf(current ?? today));
+
+  // Sempre a próxima vez que esse dia acontece — nunca joga para o passado.
+  const target = nextDateForWeekday(key, today);
 
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="label">Período do dia</p>
-        <div className="grid grid-cols-3 gap-2">
-          {PERIOD_LIST.map((p) => (
-            <button
-              key={p.key}
-              type="button"
-              onClick={() => setPeriod(p.key)}
-              aria-pressed={period === p.key}
-              className={`pressable touch-target rounded-2xl border-2 px-2 py-3 text-sm font-bold transition
-                ${
-                  period === p.key
-                    ? 'border-brand-400 bg-brand-50 text-brand-800 ring-4 ring-brand-100'
-                    : 'border-ink-200 bg-white text-ink-500'
-                }`}
-            >
-              <span className="mb-0.5 block text-xl" aria-hidden>
-                {p.icon}
-              </span>
-              {p.label}
-            </button>
-          ))}
+        <p className="label">Dia da semana</p>
+        <div className="flex justify-between gap-1.5">
+          {WEEKDAYS.map((day) => {
+            const active = key === day.key;
+            return (
+              <button
+                key={day.key}
+                type="button"
+                onClick={() => setKey(day.key)}
+                aria-pressed={active}
+                aria-label={day.full}
+                className={`pressable flex-1 rounded-2xl border-2 py-3.5 text-sm font-extrabold shadow-sticker transition
+                  ${
+                    active
+                      ? 'surface-gradient border-ink-900 text-paper-50 shadow-stickerLg'
+                      : 'border-hairline bg-surface text-ink-400 hover:border-hairline'
+                  }`}
+              >
+                {day.label}
+              </button>
+            );
+          })}
         </div>
+        <p className="mt-2 text-xs font-medium text-ink-500">
+          📅 {target === today ? 'Hoje' : formatLongDate(target)}
+        </p>
       </div>
-
-      <label className="block">
-        <span className="label">
-          Horário <span className="font-normal text-ink-400">(opcional)</span>
-        </span>
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="field tabular"
-        />
-      </label>
 
       <ErrorBanner message={error} />
 
-      <Button full loading={pending} onClick={() => onSubmit(period, time || null)}>
-        Mover para hoje
+      <Button full loading={pending} onClick={() => onSubmit(target)}>
+        Mover tarefa
       </Button>
     </div>
   );
 }
+

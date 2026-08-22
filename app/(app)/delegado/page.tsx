@@ -60,17 +60,17 @@ export default async function DelegatedPage() {
               <div className="mb-3 flex items-center gap-2.5">
                 <span
                   aria-hidden
-                  className="surface-gradient flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+                  className="surface-gradient flex h-9 w-9 items-center justify-center rounded-full border-2 border-ink-900 text-xs font-extrabold text-paper-50"
                 >
                   {group.name.charAt(0).toUpperCase()}
                 </span>
                 <h2 className="truncate text-sm font-extrabold tracking-tight text-ink-800">
                   {group.name}
                 </h2>
-                <span className="h-px flex-1 bg-ink-200/70" aria-hidden />
+                <span className="h-0.5 flex-1 rounded-full bg-hairline" aria-hidden />
                 <span
-                  className={`tabular rounded-full px-2 py-0.5 text-[11px] font-bold
-                    ${complete ? 'bg-emerald-50 text-emerald-600' : 'bg-ink-100 text-ink-500'}`}
+                  className={`tabular rounded-full px-2.5 py-1 text-[11px] font-extrabold
+                    ${complete ? 'bg-green-500 text-white' : 'bg-ink-900 text-paper-50'}`}
                 >
                   {groupDone}/{group.tasks.length}
                 </span>
@@ -99,9 +99,9 @@ export default async function DelegatedPage() {
       {canCreate && (
         <Link
           href="/nova-tarefa?destino=delegated"
-          className="pressable flex w-full items-center justify-center gap-2 rounded-3xl border-2 border-dashed
-            border-ink-200 px-4 py-4 text-sm font-bold text-ink-400 transition
-            hover:border-brand-300 hover:bg-white/60 hover:text-brand-600"
+          className="pressable flex w-full items-center justify-center gap-2 rounded-4xl border-2 border-dashed
+            border-hairline px-4 py-4 text-sm font-extrabold text-ink-400 transition
+            hover:border-ink-900 hover:bg-surface hover:text-ink-900"
         >
           + Delegar uma tarefa
         </Link>

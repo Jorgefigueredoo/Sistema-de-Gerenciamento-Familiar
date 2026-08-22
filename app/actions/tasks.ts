@@ -4,13 +4,18 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getSessionContext } from '@/lib/auth';
 import { isCategory, isPeriod, isScope } from '@/lib/categories';
-import { WEEKDAYS, buildRecurrenceRule, todayISO, type WeekdayKey } from '@/lib/dates';
+import {
+  WEEKDAYS,
+  buildRecurrenceRule,
+  isISODate,
+  todayISO,
+  type WeekdayKey,
+} from '@/lib/dates';
 import { fail, type ActionResult } from '@/lib/action-result';
 import type { TaskPeriod } from '@/types';
 
 function revalidateAll() {
   revalidatePath('/');
-  revalidatePath('/semana');
   revalidatePath('/delegado');
 }
 
@@ -44,12 +49,13 @@ export async function createTask(formData: FormData): Promise<ActionResult> {
   const periodRaw = String(formData.get('period') ?? '');
   const timeRaw = String(formData.get('time') ?? '').trim();
   const delegatedTo = String(formData.get('delegated_to') ?? '').trim();
+  const dateRaw = String(formData.get('date') ?? '').trim();
   const days = formData.getAll('weekdays').map(String);
 
   if (!title) return fail('Escreva o que precisa ser feito.');
   if (title.length > 200) return fail('O título ficou longo demais (máximo 200 caracteres).');
   if (!isCategory(category)) return fail('Escolha uma categoria.');
-  if (!isScope(scope)) return fail('Escolha se é para hoje, para a semana ou para delegar.');
+  if (!isScope(scope)) return fail('Escolha se a tarefa é sua ou se vai ser delegada.');
   if (scope === 'delegated' && !delegatedTo) return fail('Escolha para quem você quer delegar.');
 
   const validDays = days.filter((d): d is WeekdayKey =>
@@ -60,12 +66,17 @@ export async function createTask(formData: FormData): Promise<ActionResult> {
   const period: TaskPeriod | null = isPeriod(periodRaw) ? periodRaw : null;
   const time = /^\d{2}:\d{2}$/.test(timeRaw) ? timeRaw : null;
 
+  // O dia da semana escolhido no formulário chega já resolvido em data.
+  // Recorrente não tem "um" dia: a regra é que manda, então fica em hoje.
+  const date =
+    scope !== 'today' ? null : recurrenceRule || !isISODate(dateRaw) ? todayISO() : dateRaw;
+
   const supabase = createClient();
   const { error } = await supabase.from('tasks').insert({
     title,
     category,
     scope,
-    date: scope === 'today' ? todayISO() : null,
+    date,
     period: scope === 'today' ? period : null,
     time,
     delegated_to: scope === 'delegated' ? delegatedTo : null,
@@ -116,43 +127,18 @@ export async function toggleTask(
 }
 
 // ---------------------------------------------------------------------
-// "Essa semana" → "Hoje"
+// Reagendar
 // ---------------------------------------------------------------------
-export async function moveTaskToToday(
-  taskId: string,
-  period: string,
-  time: string | null,
-): Promise<ActionResult> {
+/** Joga a tarefa para outro dia da semana. */
+export async function moveTaskToDay(taskId: string, date: string): Promise<ActionResult> {
   const session = await getSessionContext();
   if (!session) return fail('Sua sessão expirou. Entre novamente.');
-  if (!isPeriod(period)) return fail('Escolha o período do dia.');
+  if (!isISODate(date)) return fail('Escolha um dia válido.');
 
   const supabase = createClient();
   const { error } = await supabase
     .from('tasks')
-    .update({
-      scope: 'today',
-      date: todayISO(),
-      period,
-      time: time && /^\d{2}:\d{2}$/.test(time) ? time : null,
-    })
-    .eq('id', taskId);
-
-  if (error) return fail(translate(error.message));
-
-  revalidateAll();
-  return { ok: true };
-}
-
-/** "Hoje" → "Essa semana" (tirar a data e deixar para depois) */
-export async function moveTaskToWeek(taskId: string): Promise<ActionResult> {
-  const session = await getSessionContext();
-  if (!session) return fail('Sua sessão expirou. Entre novamente.');
-
-  const supabase = createClient();
-  const { error } = await supabase
-    .from('tasks')
-    .update({ scope: 'this_week', date: null, period: null })
+    .update({ scope: 'today', date })
     .eq('id', taskId);
 
   if (error) return fail(translate(error.message));

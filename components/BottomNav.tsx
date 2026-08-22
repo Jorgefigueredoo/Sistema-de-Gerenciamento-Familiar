@@ -6,8 +6,7 @@ import { usePathname } from 'next/navigation';
 export type NavItem = { href: string; label: string; icon: string };
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: '/', label: 'Hoje', icon: '📅' },
-  { href: '/semana', label: 'Semana', icon: '🗓️' },
+  { href: '/', label: 'Agenda', icon: '📆' },
   { href: '/delegado', label: 'Delegado', icon: '🤝' },
 ];
 
@@ -40,7 +39,7 @@ export function BottomNav({
       <nav
         aria-label="Navegação principal"
         className="pointer-events-auto mx-auto flex max-w-md items-center justify-around gap-1
-          rounded-full border border-white/80 bg-white/85 px-2 py-1.5 shadow-nav backdrop-blur-xl"
+          rounded-full border-2 border-hairline bg-surface/90 px-2 py-1.5 shadow-nav backdrop-blur-xl"
       >
         {left.map((item) => (
           <NavButton key={item.href} item={item} active={isNavActive(pathname, item.href)} />
@@ -50,8 +49,8 @@ export function BottomNav({
           <Link
             href="/nova-tarefa"
             aria-label="Nova tarefa"
-            className="pressable surface-gradient -my-3 flex h-14 w-14 shrink-0 items-center justify-center
-              rounded-full text-white shadow-glow"
+            className="pressable surface-gradient -my-3 flex h-16 w-16 shrink-0 items-center justify-center
+              rounded-full border-2 border-ink-900 text-paper-50 shadow-stickerLg"
           >
             <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden>
               <path
@@ -78,13 +77,13 @@ function NavButton({ item, active }: { item: NavItem; active: boolean }) {
       href={item.href}
       aria-current={active ? 'page' : undefined}
       className={`pressable flex min-h-[48px] flex-1 flex-col items-center justify-center gap-0.5 rounded-full
-        px-1 py-1.5 text-[10px] font-bold transition
-        ${active ? 'bg-brand-50 text-brand-700' : 'text-ink-400 hover:text-ink-600'}`}
+        px-1 py-1.5 text-[10px] font-extrabold transition
+        ${active ? 'bg-ink-900 text-paper-50' : 'text-ink-400 hover:text-ink-700'}`}
     >
       <span className={`text-lg transition ${active ? 'scale-110' : ''}`} aria-hidden>
         {item.icon}
       </span>
-      {item.label}
+      <span className="w-full truncate text-center">{item.label}</span>
     </Link>
   );
 }

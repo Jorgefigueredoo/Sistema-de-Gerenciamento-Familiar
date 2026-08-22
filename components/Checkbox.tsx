@@ -18,7 +18,7 @@ export function Checkbox({
   color?: string;
   size?: 'md' | 'sm';
 }) {
-  const box = size === 'sm' ? 'h-6 w-6' : 'h-7 w-7';
+  const box = size === 'sm' ? 'h-7 w-7' : 'h-8 w-8';
 
   return (
     <label className={`relative shrink-0 cursor-pointer ${box}`}>
@@ -33,8 +33,8 @@ export function Checkbox({
       <span
         aria-hidden
         className={`pointer-events-none flex h-full w-full items-center justify-center rounded-full border-2
-          transition duration-200 peer-focus-visible:ring-4 peer-focus-visible:ring-brand-200
-          ${checked ? `${color} border-transparent` : 'border-ink-300 bg-white peer-hover:border-ink-400'}`}
+          transition duration-200 peer-focus-visible:ring-4 peer-focus-visible:ring-accent-300
+          ${checked ? `${color} border-transparent` : 'border-hairline bg-surface peer-hover:border-ink-900'}`}
       >
         <svg
           viewBox="0 0 24 24"
