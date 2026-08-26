@@ -113,6 +113,7 @@ No painel do Supabase, abra **SQL Editor → New query** e rode os três arquivo
 2. `supabase/migrations/20260822090100_rls_policies.sql`
 3. `supabase/migrations/20260822090200_seed.sql`
 4. `supabase/migrations/20260822090300_task_completions.sql`
+5. `supabase/migrations/20260826090000_push_subscriptions.sql`
 
 Basta copiar o conteúdo de cada arquivo, colar e clicar em **Run**. Os scripts são idempotentes: rodar de novo não duplica nada.
 

@@ -1,5 +1,8 @@
 import { SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY, SUPABASE_URL } from '@/lib/supabase/config';
 
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY ?? '';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT ?? '';
+
 /** Leitura centralizada das variáveis de ambiente, com erro legível. */
 
 function required(name: string, value: string): string {
@@ -26,5 +29,11 @@ export const env = {
       'SUPABASE_SERVICE_ROLE_KEY (ou SUPABASE_SECRET_KEY)',
       SUPABASE_SERVICE_KEY,
     );
+  },
+  get vapidPrivateKey() {
+    return required('VAPID_PRIVATE_KEY', VAPID_PRIVATE_KEY);
+  },
+  get vapidSubject() {
+    return required('VAPID_SUBJECT', VAPID_SUBJECT);
   },
 };

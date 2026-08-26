@@ -1,4 +1,5 @@
 import { signOut } from '@/app/actions/auth';
+import { NotificationToggle } from '@/components/NotificationToggle';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 /** Cabeçalho do celular. No desktop essa função é da Sidebar. */
@@ -21,6 +22,7 @@ export function AppHeader({ name, roleName }: { name: string; roleName: string |
         </div>
 
         <div className="flex items-center gap-1">
+          <NotificationToggle compact />
           <ThemeSwitcher compact placement="down" />
 
           <span

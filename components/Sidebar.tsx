@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { isNavActive, NAV_ITEMS } from '@/components/BottomNav';
 import { signOut } from '@/app/actions/auth';
+import { NotificationToggle } from '@/components/NotificationToggle';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 /**
@@ -120,6 +121,7 @@ export function Sidebar({
         </form>
 
         <div className="mt-2 border-t border-white/10 pt-2">
+          <NotificationToggle onDark />
           <ThemeSwitcher onDark />
         </div>
       </div>
